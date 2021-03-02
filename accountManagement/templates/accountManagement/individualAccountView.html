@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Individual View{% endblock %}
+
+{% block content %}
+
+<h3 class="center-align">{{ tempUser }}</h3>
+<hr><br><br>
+
+<h4 class="left-align">Details</h4>
+<hr>
+<table class="striped responsive-table">
+
+    <tbody>
+        <tr>
+            <td>Username:</td>
+            <td>{{ tempUser.first_name }} {{ tempUser.last_name }}</td>
+        </tr>
+        <tr>
+            <td>Contact:</td>
+            <td>{{ tempUser.email }}</td>
+        </tr>
+        <tr>
+            <td>Institution:</td>
+            <td>{{ tempUser.institution }}</td>
+        </tr>
+        <tr>
+            <td>Account Type:</td>
+            <td>{{ tempUser.accountType }}</td>
+        </tr>
+        <tr>
+            <td>Time Online Today:</td>
+            <td>{{ timeOnline }}</td>
+        </tr>
+    </tbody>
+
+</table>
+
+<br><br>
+<h4 class="left-align">Classes</h4>
+<hr> 
+
+<table>
+    
+    <thead>
+        <th>Class Name</th>
+        <th>Institution</th>
+    </thead>
+
+    <tbody>
+        {% for i in classes %}
+        <tr>
+            <td>
+                <a href="/class/{{ i.id }}/accounts">{{ i.className }}</a>
+            </td>
+            <td>{{ i.classInstitution }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+
+{% if user.accountType == "Teacher" and quizResults %}
+    <br><br>
+    <h4 class="left-align">Quizzes</h4>
+    <hr> 
+
+    <table>
+        
+        <thead>
+            <th>Quiz Name</th>
+            <th>score</th>
+        </thead>
+
+        <tbody>
+            {% for quizName, score in quizResults.items %}
+            <tr>
+                <td>
+                    <a href="/account/{{ tempUser.id }}/{{ quizName }}"> {{ quizName }} </a>
+                </td>
+                <td>{{ score }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form method="POST">{% csrf_token %}<button class="submitButton red waves-effect waves-light btn" style="margin-top: 20px;" type="submit"><i class="material-icons right">remove_circle</i>clear quiz responses</button>
+    </form>
+
+
+    <p style="padding-top: 50px;"></p>
+{% endif %}
+{% endblock %}

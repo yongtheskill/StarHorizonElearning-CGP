@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Video Lessons{% endblock %}
+
+{% block css %}
+<style>
+    /* pagination colours */
+    .tabs .tab a {
+        color: #0e143f;
+    }
+    .tabs .tab a:focus, .tabs .tab a:focus.active {
+        background-color: #00000031;
+    }
+    .tabs .tab a:hover, .tabs .tab a.active {
+        color: #0e143f;
+    }
+    .tabs .indicator {
+        background-color: #0e143f;
+    }
+
+    /* pagination box size */
+    .tabs-content {
+        height: 665px !important;
+    }
+
+    /* dropdown scrolling */
+    .select-dropdown{
+        max-height: 250px !important;
+    }
+
+    /* list styling */
+    ul.collection {
+        border-top: none;
+        border-left: none;
+        border-right: none;
+    }
+    th, td {
+        text-align: center;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+<h2 class="center-align">Manage Video Lessons</h2>
+
+<div class="row paginationRow">
+    <div class="col s12">
+        <ul class="tabs">
+            <li class="tab"><a href="#all">All Videos</a></li>
+            <li class="tab"><a href="#add">Add Videos</a></li>
+            <li class="tab"><a href="#edit">Edit Video Details</a></li>
+        </ul>
+    </div>
+
+
+
+
+
+
+
+    <!-- LIST VIDEOS -->
+
+    <div id="all" class="col s12">
+        <table style="margin-top: 10px;">
+            <thead>
+              <tr>
+                  <th>Video Name</th>
+                  <th>Video ID</th>
+                  <th>View Video</th>
+                  <th>Edit Details</th>
+              </tr>
+            </thead>
+    
+            <tbody>
+                {% for i in videoLessonObjects %}
+                <tr>
+                    <td>{{ i.videoName }}</td>
+                    <td>{{ i.videoID }}</td>
+                    <td><a href="../view/{{ i.videoID }}"><i class="material-icons text-accent-1">visibility</i></a></td>
+                    <td><a onclick="goToEditPage('{{ i.videoID }}')" href="#"><i class="material-icons text-accent-1">edit</i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+
+
+
+
+
+    <!-- ADD VIDEO -->
+
+    <div id="add" class="col s12">
+        <div>
+            <h4>Add New Video</h4>
+            <form method="POST" enctype="multipart/form-data" id="addForm">{% csrf_token %}
+                <input type="hidden" name="managementAction" value="create" />
+
+                <div class="row">
+                    <div class="input-field col s12 m8">
+                        <i class="material-icons text-accent-1 prefix">mode_edit</i>
+                        <input class="black-text" type="text" name="videoName" id="id_videoName" autofocus required>
+                        <label class="black-text" for="id_videoName">Video Name</label>
+                    </div>
+                    <div class="input-field col s12 m4">
+                        <i class="material-icons text-accent-1 prefix">code</i>
+                        <input readonly class="grey-text text-darken-1" type="text" name="videoID" id="id_videoID" value="{{videoIDtoUse}}" required>
+                        <label class="black-text text-darken-4" for="id_videoID">video ID</label>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="input-field col s12">
+                        <i class="material-icons text-accent-1 prefix">mode_edit</i>
+                    <textarea class="black-text materialize-textarea" name="additionalComments" id="id_additionalComments" ></textarea>
+                    <label class="black-text" for="id_additionalComments">Additional Comments</label>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <!--select course-->
+                    <div class="input-field col s12 m6">
+                        <i class="material-icons text-accent-1 prefix">add</i>
+                        <select id="courseSelect" name="courseSelector" onchange="selectUpdated()">
+                            <option value="" disabled selected>Select Course</option>
+                            {% for i in courseObjects %}
+                            <option value="{{i.pk}}">{{i.courseName}}</option>
+                            {% endfor %}
+                        </select>
+                        <label>Select Course</label>
+                    </div>  
+                    {% for i in courseIDs %}
+                        <div class="input-field col s12 m6 courseSelectDiv" id="course{{ i }}">
+                            <i class="material-icons text-accent-1 prefix">add</i>
+                            <select id="moduleSelect" name="assignedMod">
+                                <option value="" disabled selected>Select module for the video</option>
+                                {% for j in moduleObjects %}
+                                    {% if j.course.id == i %}
+                                        <option value="{{j.pk}}" class="courseId{{j.course.id}} courseIdOption">{{j.moduleName}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <label>Assign video to module</label>
+                        </div>  
+                    {% endfor %}
+                </div>
+
+
+                <div class="row">
+                    <div class="col s12 m6">
+                        <div class="file-field input-field">
+                            <div class="btn accent-1">
+                            <span>Upload Video File</span>
+                            <input name="videoFile" type="file" accept=".mp4" class="validate" required>
+                            </div>
+                            <div class="file-path-wrapper">
+                            <input class="file-path validate" name="fileName" type="text" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn accent-1" type="submit" name="action">Submit
+                    <i class="material-icons right">send</i>
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- edit -->
+
+    <div id="edit" class="col s12">
+        <div>
+            <h4>Edit Video Details</h4>
+            <form method="POST" enctype="multipart/form-data" id="editForm">{% csrf_token %}
+                <input type="hidden" name="managementAction" value="edit" />
+
+                <div class="row">
+                    <div class="input-field col s12 m8">
+                        <select name="videoIDToEdit" id="videoToEditSelector">
+                            <option value="" disabled selected>Select Video Name</option>
+                            {% for i in videoLessonObjects %}
+                                <option value="{{ i.videoID }}">{{ i.videoName }}</option>
+                            {% endfor %}
+                        </select>
+                        <label>Select Video</label>
+                    </div>
+                    <div class="input-field col s12 m4">
+                        <i class="material-icons text-accent-1 prefix">code</i>
+                        <input readonly class="grey-text text-darken-1" type="text" name="videoID" id="id_videoID" value="" required>
+                        <label class="black-text text-darken-4" for="id_videoID">video ID</label>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="input-field col s12">
+                        <i class="material-icons text-accent-1 prefix">mode_edit</i>
+                    <textarea class="black-text materialize-textarea" name="additionalComments" id="id_additionalComments" required></textarea>
+                    <label class="black-text" for="id_additionalComments">Additional Comments</label>
+                    </div>
+                </div>
+
+                <button class="btn accent-1" type="submit" name="action">Submit
+                    <i class="material-icons right">send</i>
+                </button>
+
+            </form>
+            <div class="row">
+        
+                <form method="post" action="/videoLessons/deleteVideo/" >{% csrf_token %}
+                    <input readonly class="grey-text text-darken-1" type="text" name="videoID" id="id_videoID2" value="" required hidden>
+                    <button class="btn red darken-2 right" type="submit" name="action">Delete
+                        <i class="material-icons right">delete</i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    
+    </div>
+
+
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+//assignment
+$('.chips').chips();
+
+
+
+//create/edit form
+$(document).ready(function(){
+    $('.tabs').tabs({ swipeable: true, duration: 300 });
+    $('select').formSelect();
+});
+
+$(function(){
+    //add form
+    $("#addForm span:contains('None')").on("click", function() {
+        $("#addForm #afterActionInput").attr("value", "none");
+        $("#addForm #quizSelect, #addForm #videoSelect").hide(400, "swing");
+    });
+    $("#addForm span:contains('Quiz')").on("click", function() {
+        $("#addForm #afterActionInput").attr("value", "quiz");
+        $("#addForm #quizSelect").show(400, "swing");
+        $("#addForm #videoSelect").hide(400, "swing");
+    });
+    $("#addForm span:contains('Next Video')").on("click", function() {
+        $("#addForm #afterActionInput").attr("value", "nextVideo");
+        $("#addForm #videoSelect").show(400, "swing");
+        $("#addForm #quizSelect").hide(400, "swing");
+    });
+
+    //edit form
+    $("#editForm span:contains('None')").on("click", function() {
+        $("#editForm #afterActionInput").attr("value", "none");
+        $("#editForm #quizSelect, #addForm #videoSelect").hide(400, "swing");
+    });
+    $("#editForm span:contains('Quiz')").on("click", function() {
+        $("#editForm #afterActionInput").attr("value", "quiz");
+        $("#editForm #quizSelect").show(400, "swing");
+        $("#editForm #videoSelect").hide(400, "swing");
+    });
+    $("#editForm span:contains('Next Video')").on("click", function() {
+        $("#editForm #afterActionInput").attr("value", "nextVideo");
+        $("#editForm #videoSelect").show(400, "swing");
+        $("#editForm #quizSelect").hide(400, "swing");
+    });
+
+    $("[name='videoIDToEdit']").change(function (){
+        setToEdit($("[name='videoIDToEdit']").val())
+    });
+});
+    
+
+function goToEditPage(videoIDtoEdit) {
+    M.Tabs.getInstance($('.tabs')).select('edit');
+    setToEdit(videoIDtoEdit);
+}
+
+function setToEdit(selectedVideoID){
+        $("#editForm input#id_videoID").val(selectedVideoID);
+        $("input#id_videoID2").val(selectedVideoID);
+        $("#editForm input#id_videoID").addClass("active");
+
+        if (false){}
+
+        {% for i in videoLessonObjects %}
+        else if (selectedVideoID === "{{ i.videoID }}"){
+            $("#videoToEditSelector").val("{{ i.videoID }}").closest('.select-wrapper').find('li').removeClass("active").closest('.select-wrapper').find('.select-dropdown').val("{{ i.videoID }}").find('span:contains(' + "{{ i.videoID }}" + ')').parent().addClass('selected active');
+            $("#videoToEditSelector").formSelect();
+            $("#editForm textarea#id_additionalComments").val("{{ i.additionalComments }}");
+            $("#editForm textarea#id_additionalComments").addClass("active");
+            //other options
+        }
+
+        {% endfor %}
+
+        M.updateTextFields();
+    }
+
+
+
+
+    $( document ).ready(function() {
+        $('select').formSelect();
+        $('.courseSelectDiv').hide();
+    });
+
+    var modules = {
+        {% for i in moduleObjects %}
+            {{i.course.id}}: "{{i.moduleName}}",
+        {% endfor %}
+    };
+
+    function selectUpdated(){
+        // get selected course module
+        var selectedCourseID = $("#courseSelect").val();
+        // set module selections
+        $('.courseSelectDiv').hide();
+        $("#course" + selectedCourseID).show(400, "swing");
+    }
+
+
+
+</script>
+
+{% endblock %}

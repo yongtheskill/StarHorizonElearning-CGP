@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Join Live Lesson{% endblock %}
+
+
+{% block css %}
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<h2 class="center-align willJoinTitle">You will join {{ StreamID }} in: </h2>
+<h1 class="center-align text-accent-1 timer"></h1>
+
+<div class="loadingPage" style="display: none;">
+    <h1 class="center-align" style="padding-bottom: 50px;">Waiting for {{ StreamID }} to begin...</h1>
+    <div class="progress accent-1">
+        <div class="indeterminate white"></div>
+    </div>
+</div>
+<a class="popupBlocked" onclick="setTimeout(function(){window.location.replace('{% if user.accountType == "Teacher" %}/live/ongoingstream/{{ StreamID }}/{% else %}/{% endif %}');}, 1000); " style="display: none;" href="https://live.gotutor.sg/#/{{ StreamID }}?usr={{ usr }}{% if user.accountType == "Teacher" %}&tchr=true{% endif %}" target="_blank">Click here to join if you are unable to enable popups</a>
+
+
+
+
+{% endblock %}
+
+
+
+
+{% block javascript %}
+
+
+{% if user.accountType == "Teacher" %}
+<script>
+    
+    // request permission on page load
+    document.addEventListener('DOMContentLoaded', function() {
+    if (!Notification) {
+        alert('Desktop notifications not available in your browser. Try Chromium.');
+        return;
+    }
+
+    if (Notification.permission !== 'granted')
+        Notification.requestPermission();
+    });
+
+    
+
+    var timeToCheck = {{ timeToCheck }};
+    var d = new Date();
+    var currentTime = d.getTime();
+    interval = setInterval(function(){ checkTime(); }, 1000);
+    function checkTime(){
+        d = new Date();
+        currentTime = d.getTime();
+        if (currentTime >= timeToCheck){
+            clearInterval(interval);
+            sendNotif();
+        }
+    }
+
+
+    function sendNotif() {
+        // Let's check if the browser supports notifications
+        if (!("Notification" in window)) {
+            alert("This browser does not support desktop notification");
+        }
+
+        // Let's check whether notification permissions have already been granted
+        else if (Notification.permission === "granted") {
+            // If it's okay let's create a notification
+            var notification = new Notification("Your lesson is about to end in 5 minutes!", {body: "Click on this notification to extend it."});
+            notification.onclick = function(){window.open("/live/extend/{{ StreamID }}");}
+        }
+
+        // Otherwise, we need to ask the user for permission
+        else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(function (permission) {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+                var notification = new Notification("Your lesson is about to end in 5 minutes!", {body: "Click on this notification to extend it."});
+                notification.onclick = function(){window.open("/live/extend/{{ liveLessonID }}");}
+            }
+            });
+        }
+    }
+
+</script>
+{% endif %}
+
+<script>
+    
+//countdownTimer
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    intervalTimer = setInterval(function () {
+        hours = parseInt(timer / 3600, 10);
+        minutes = parseInt(timer / 60 % 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        hours = hours < 10 ? "0" + hours : hours;
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.text(hours + ":" + minutes + ":" + seconds);
+
+        if (--timer < 0) {     
+            clearInterval(intervalTimer);
+            display.remove();
+            $('.willJoinTitle').remove();  
+            waitToJoin();
+        }
+    }, 1000);
+}
+
+jQuery(function ($) {
+    var display = $('.timer');
+    startTimer({{ ttl }}, display);
+});
+
+var alerted = false;
+//waitForAws + Join
+function waitToJoin() {
+    $('.loadingPage').css({'display': 'block'});
+    checkServerStatus();
+    var waitToJoinInterval = setInterval(checkServerStatus, 5000)
+    function checkServerStatus(){
+        jQuery.get("../serverStatus/", function(data) {
+            console.log(data);
+            if(data === "Up"){
+                console.log("yes");
+                var win = window.open("https://live.gotutor.sg/#/{{ StreamID }}?usr={{ usr }}{% if user.accountType == "Teacher" %}&tchr=true{% endif %}", "_blank");
+                if (win) {
+                    //Browser has allowed it to be opened
+                    win.focus();
+                    clearInterval(waitToJoinInterval);
+                    window.location.replace('{% if user.accountType == "Teacher" %}/live/ongoingstream/{{ StreamID }}/{% else %}/{% endif %}');
+                } else {
+                    if (!alerted){
+                        //Browser has blocked it
+                        alert('Please allow popups for this website');
+                        $('.popupBlocked').css({'display': 'block'});
+                        alerted = true;
+                    }
+                }
+            }
+        });
+    }
+}
+
+
+
+</script>
+
+{% endblock %}

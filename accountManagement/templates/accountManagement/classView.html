@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Class View{% endblock %}
+
+{% block content %}
+
+<h3 class="center-align">{{ class }}</h3>
+<br>
+
+<h4>Courses</h4>
+<hr>
+
+{% for i in courses %}
+<table class="striped responsive-table">
+    <caption class="left-align">
+        <h5><a href="/course/{{ i.id }}/accounts">{{ i.courseName }}</a></h5>
+    </caption>
+    
+    <colgroup>
+        <col>
+        <col>
+        <col style="width: fit-content">
+    </colgroup>
+
+    <thead>
+        <th>Modules</th>
+    </thead>
+
+    <tbody>
+        {% for j in i.modules %}
+        <tr>
+            <td>{{ j.moduleName }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+
+
+{% if user.accountType == 'Teacher' %}
+<!-- add button -->
+<div class="addBtnClose">
+    <a class="btn-floating btn-large accent-1" href="/course/create/{{ class.id }}">
+        <i class="large material-icons">note_add</i>
+    </a>
+</div>
+{% endif %}
+
+<br><br>
+<h4>People</h4>
+<hr>
+<table class="striped responsive-table">
+    <caption class="left-align"><h5>Teachers</h5></caption>    
+    <thead>
+        <th>Name</th>
+        <th>Email</th>
+    </thead>
+
+    <tbody>
+        {% for i in teachers %}
+        <tr>
+            <td>
+                <a href="/account/{{ i.id }}">{{ i.first_name }} {{ i.last_name }}</a>
+            </td>
+            <td>{{ i.email }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br><br>
+
+<table class="striped responsive-table">
+    <caption class="left-align"><h5>Students</h5></caption>    
+    <thead>
+        <tr>
+            <th>Name</th>
+            {% if user.accountType == 'Teacher' %}
+            <th>Email</th>
+            <th>Uncompleted Tasks</th>
+            {% endif %}
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for i in students %}
+        <tr>
+            <td>
+                {% if user.accountType == 'Teacher' %}
+                <a href="/account/{{ i.id }}">{{ i.first_name }} {{ i.last_name }}</a>
+                {% else %}
+                {{ i.first_name }} {{ i.last_name }}
+                {% endif %}
+            </td>
+            {% if user.accountType == 'Teacher' %}
+            <td>{{ i.email }}</td>
+            <td>{{ i.uncompletedTasks }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if liveLessonsNew or liveLessonsOld %}
+<br><br>
+<h4>Live Lessons</h4>
+<hr>
+<table class="striped responsive-table">
+    <thead>
+        <th>Live Lesson</th>
+        <th>Stream Time</th>
+    </thead>
+
+    <tbody>
+        {% for i in liveLessonsNew %}
+        <tr>
+            <td>
+                <a href="/live/join/{{ i.streamID }}">{{ i.lessonName }}</a>
+            </td>
+            <td>{{ i.streamTime }}</td>
+            <td style="color: red">New</td>
+        </tr>
+        {% endfor %}
+        {% for i in liveLessonsOld %}
+        <tr>
+            <td>
+                <a href="/live/join/{{ i.streamID }}">{{ i.lessonName }}</a>
+            </td>
+            <td>{{ i.streamTime }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+
+{% if user.accountType == "Teacher" %}
+{% if quizData %}
+<br><br>
+<h4>All Quizzes</h4>
+<hr>
+
+<table class="striped responsive-table">
+    <thead>
+        <th>Quiz Name</th>
+        <th>Completed</th>
+        <th>Passed</th>
+    </thead>
+
+    <tbody>
+        {% for quizDataRow in quizData %}
+        <tr>
+            <td>{{ quizDataRow.0 }}</td>
+            <td>{{ quizDataRow.1 }}/{{ nStudents }}</td>
+            <td>{{ quizDataRow.2 }}/{{ nStudents }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endif %}
+{% endblock %}

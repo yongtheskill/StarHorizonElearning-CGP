@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block css %}
+<link type="text/css" rel="stylesheet" href="{% static "home/home.css" %}"/>
+
+<style>
+
+    .gotutor-logo{
+        height: 200px;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block fullWidthContent %}
+
+<div class="center-align">
+    <div class="full-height full-width valign-wrapper" style="filter: brightness(40%); background-image: url('{% static "img/homeBg.jpg" %}'); background-repeat: no-repeat; background-size: cover;  background-attachment: fixed; z-index: -10000;"></div>
+    
+    <div class="home-options center-align" style="position: absolute; top: 50%; left: 50%;  transform: translate(-50%, -50%);">
+            {% if user.is_authenticated %}
+            <img class="gotutor-logo" src="{% static "img/gotutorLogoOnly.png" %}" alt="Gotutor Logo">
+            <h2 class="white-text" style="font-family: Raleway; font-weight: 800; margin-top: 0;">Welcome, {{ user.first_name }} {{ user.last_name }}</h2>
+            {% else %}
+            <img class="gotutor-logo" src="{% static "img/gotutorLogoOnly.png" %}" alt="Gotutor Logo">
+            <h2 class="white-text" style="padding-bottom: 1px;"></h2>
+            <a class="waves-effect waves-light btn-large login-button accent-2 black-text" href="/login">Log In</a>
+            {% endif %}
+    </div>
+    <img style="transform: translate(0%, -150%); width: 60px;" src="{% static "img/downArrow.png" %}">
+</div>
+
+
+
+
+
+
+
+<div>
+    <div class="container" style="padding-top: 75px;">
+        <div class="row">
+            <div class="col s12 m10 offset-m1">
+
+            <div class="row">
+                <div class="col s12 m4">
+                <div class="center promo">
+                    <i class="material-icons">flash_on</i>
+                    <p class="promo-header">Quick and Easy Learning</p>
+                    <p class="promo-caption">Whether at home or in your classroom, the e-learning experience is smooth and unaffected by the situation. In the midst of extraneous circumstances, StarHorizon's e-learning platform provides students with the same quality lessons on financial literacy and entrepreneurship.</p>
+                </div>
+                </div>
+
+                <div class="col s12 m4">
+                <div class="center promo">
+                    <i class="material-icons">group</i>
+                    <p class="promo-header">Interactive and Engaging</p>
+                    <p class="promo-caption">We place great emphasis on the learning process on and offline. Financial literacy and entrepreneurship is taught without long boring lectures and reading. Here, we prioritise interactive learning which gauges student understanding and keeps them engaged to the course.</p>
+                </div>
+                </div>
+
+                <div class="col s12 m4">
+                <div class="center promo">
+                    <i class="material-icons">settings</i>
+                    <p class="promo-header">Added Functionality</p>
+                    <p class="promo-caption">On top of the courses provided, we have many features to ensure students can have the highest quality learning, such as live lessons, interactive quizzes and features to incentivise active learning. Students will always be able to pose questions and clarifications through live chat.</p>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+  
+<footer class="page-footer accent-1" style="padding:0;">
+    <div class="footer-copyright">
+      <div class="container">
+      © 2020 Star Horizon Learning Pte. Ltd.
+      <a class="grey-text text-lighten-4 right" href="{% static "docs/GotutorTermsOfUse.pdf" %}">Terms of Use</a>
+      <a class="grey-text text-lighten-4 right" href="{% static "docs/GotutorPrivacyStatement.pdf" %}" style="padding-right: 50px;">Privacy Statement</a>
+      </div>
+    </div>
+</footer>
+{% endblock %}
+
+
+
+
+{% block javascript %}
+{% load static %}
+
+
+{% if isongoingstream %}
+{% if user.accountType == "Teacher" %}
+    <script>
+        
+        // request permission on page load
+        document.addEventListener('DOMContentLoaded', function() {
+        if (!Notification) {
+            alert('Desktop notifications not available in your browser. Try Chromium.');
+            return;
+        }
+
+        if (Notification.permission !== 'granted')
+            Notification.requestPermission();
+        });
+
+        
+
+        var timeToCheck = {{ timeToCheck }};
+        var d = new Date();
+        var currentTime = d.getTime();
+        interval = setInterval(function(){ checkTime(); }, 1000);
+        function checkTime(){
+            d = new Date();
+            currentTime = d.getTime();
+            if (currentTime >= timeToCheck){
+                clearInterval(interval);
+                sendNotif();
+            }
+        }
+
+
+        function sendNotif() {
+            // Let's check if the browser supports notifications
+            if (!("Notification" in window)) {
+                alert("This browser does not support desktop notification");
+            }
+
+            // Let's check whether notification permissions have already been granted
+            else if (Notification.permission === "granted") {
+                // If it's okay let's create a notification
+                var notification = new Notification("Your lesson is about to end in 5 minutes!", {body: "Click on this notification to extend it."});
+                notification.onclick = function(){window.open("/live/extend/{{ StreamID }}");}
+            }
+
+            // Otherwise, we need to ask the user for permission
+            else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(function (permission) {
+                // If the user accepts, let's create a notification
+                if (permission === "granted") {
+                    var notification = new Notification("Your lesson is about to end in 5 minutes!", {body: "Click on this notification to extend it."});
+                    notification.onclick = function(){window.open("/live/extend/{{ liveLessonID }}");}
+                }
+                });
+            }
+        }
+
+    </script>
+{% endif %}
+{% endif %}
+
+{% endblock %}

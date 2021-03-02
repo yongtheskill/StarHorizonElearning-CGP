@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Quiz{% endblock %}
+
+
+{% block css %}
+<link type="text/css" rel="stylesheet" href="{% static "css/quizzes.css" %}" />
+{% endblock %}
+
+
+
+{% block content %}
+<a class="waves-effect waves-black btn-flat" onclick="window.history.back();"><i class="material-icons left" style="margin-right: 0px;">arrow_back_ios</i>Back</a>
+
+
+<h2 class="center-align">Create Quiz</h2>
+
+
+<div class="row">
+    <div class="col s12">
+        <form id="quizDataForm" method="post">{% csrf_token %}
+            <div class="row">
+                <div class="input-field col s12 m8">
+                    <i class="material-icons text-accent-1 prefix">mode_edit</i>
+                    <input class="black-text" type="text" name="quizName" id="id_quizName" autofocus required>
+                    <label class="black-text" for="id_quizName">Quiz Name</label>
+                </div>
+                <div class="input-field col s12 m4">
+                    <i class="material-icons text-accent-1 prefix">code</i>
+                    <input readonly class="grey-text text-darken-1" type="text" name="quizID" id="id_quizID" value="{{ quizIDtoUse }}" required>
+                    <label class="black-text text-darken-4" for="id_quizID">Quiz ID</label>
+                </div>
+            </div>    
+            
+            
+            <div class="row">
+                <div class="input-field col s12 m4">
+                    <i class="material-icons text-accent-1 prefix">today</i>
+                    <input type="text" name="dueDate" class="datepicker" id="id_dueDate" required>
+                    <label class="black-text" for="id_dueDate">Due Date</label>
+                </div>  
+                <div class="input-field col s12 m4">
+                    <i class="material-icons text-accent-1 prefix">schedule</i>
+                    <input type="text" name="dueTime" class="timepicker" id="id_dueTime" required>
+                    <label class="black-text" for="id_dueTime">Due Time</label>
+                </div>
+                <div class="input-field col s12 m4">
+                    <i class="material-icons text-accent-1 prefix">done</i>
+                    <input class="black-text" type="number" name="passingScore" id="id_passingScore" min=0 max=1 step=1 required>
+                    <label class="black-text" for="id_passingScore">Passing Score</label>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <!--select course-->
+                <div class="input-field col s12 m6">
+                    <i class="material-icons text-accent-1 prefix">add</i>
+                    <select id="courseSelect" name="courseSelector" onchange="selectUpdated()" required>
+                        <option value="" disabled selected>Select Course</option>
+                        {% for i in courseObjects %}
+                        <option value="{{i.pk}}">{{i.courseName}}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Select Course</label>
+                </div>  
+                {% for i in courseIDs %}
+                    <div class="input-field col s12 m6 courseSelectDiv" id="course{{ i }}">
+                        <i class="material-icons text-accent-1 prefix">add</i>
+                        <select id="moduleSelect{{ i }}" name="assignedModule" required>
+                            <option value="" disabled selected>Select module for the quiz</option>
+                            {% for j in moduleObjects %}
+                                {% if j.course.id == i %}
+                                    <option value="{{j.pk}}" class="courseId{{j.course.id}} courseIdOption">{{j.moduleName}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <label>Assign quiz to module</label>
+                    </div>  
+                {% endfor %}
+            </div>
+
+
+            <input hidden name="allQuestionsJSON" id="allQuestionsJSON"></input>
+        </form>
+
+        
+        <!-- Questions -->
+        <div id="allQuesitonsContainer">
+
+        </div>
+
+
+
+        <!-- FAB -->
+        <div class="row">
+            <div class="fixed-action-btn">
+                <a class="btn-floating btn-large accent-2-btn">
+                    <i class="large material-icons">add</i>
+                </a>
+                <ul>
+                    <li><a onclick="createQuestion('sa')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">short_text</i>Short Answer</a></li>
+                    <li><a onclick="createQuestion('la')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">subject</i>Long Answer</a></li>
+                    <li><a onclick="createQuestion('mc')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">radio_button_checked</i>Multiple Choice</a></li>
+                    <li><a onclick="createQuestion('cb')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">check_box</i>Checkboxes</a></li>
+                </ul>
+            </div>
+            <a class="submitButton accent-1-btn waves-effect waves-light btn" style="margin-top: 5px;" onclick="submitForm()"><i class="material-icons right">done</i>create quiz</a>
+        </div>
+    </div>
+  </div>
+
+
+
+{% endblock %}
+
+
+
+
+{% block javascript %}
+<script type="text/javascript" src="{% static "js/quizzes_create.js" %}"></script>
+
+<script>
+
+$( document ).ready(function() {
+    $('.fixed-action-btn').floatingActionButton({
+        direction: 'right',
+        hoverEnabled: false
+    });
+    $('select').formSelect();
+    setTags(
+        { 
+            {% for i in moduleObjects %}
+            "{{ i.pk|safe }}": {{ i.tags|safe }},
+            {% endfor %}
+         }
+    );
+});
+
+
+    $(document).ready(function(){
+        $('select').formSelect();
+        var elems = document.querySelectorAll('.datepicker');
+        var instances = M.Datepicker.init(elems, {defaultDate: new Date(), setDefaultDate: true} );
+        $('.timepicker').timepicker();
+    });
+
+    
+
+    $( document ).ready(function() {
+        $('select').formSelect();
+        $('.courseSelectDiv').hide();
+    });
+
+    var modules = {
+        {% for i in moduleObjects %}
+            {{i.course.id}}: "{{i.moduleName}}",
+        {% endfor %}
+    };
+    var selectedCourseID;
+    function selectUpdated(){
+        // get selected course module
+        selectedCourseID = $("#courseSelect").val();
+        // set module selections
+        $('.courseSelectDiv').hide();
+        $("#course" + selectedCourseID).show(400, "swing");
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+          var elems = document.querySelectorAll('#baseModal');
+          var instances = M.Modal.init(elems, {onCloseEnd: modalClosed});
+          var instance = M.Modal.getInstance($("#baseModal"));
+          instance.open();
+        });
+
+
+$(function () {
+  $("#id_passingScore").keydown(function () {
+    // Save old value.
+    if (!$(this).val() || (parseInt($(this).val()) <= $(this).attr("max") && parseInt($(this).val()) >= $(this).attr("min")))
+    $(this).data("old", $(this).val());
+  });
+  $("#id_passingScore").keyup(function () {
+    // Check correct, else revert back to old value.
+    if (!$(this).val() || (parseInt($(this).val()) <= $(this).attr("max") && parseInt($(this).val()) >= $(this).attr("min")))
+      ;
+    else{
+      $(this).val($(this).data("old"));
+      const errorNotif = window.createNotification({
+          theme: 'warning',
+          showDuration: 5000,
+          });
+          // Invoke success notification
+          errorNotif({ 
+              message: 'The passing score should be positive and less than the maximum possible score' 
+          });}
+  });
+});
+
+
+
+</script>
+{% endblock %}

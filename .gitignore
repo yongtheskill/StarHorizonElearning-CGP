@@ -1,0 +1,6 @@
+!**/__pycache__/
+.env
+*.pem
+*.ppk
+*.pyc
+.vscode/settings.json

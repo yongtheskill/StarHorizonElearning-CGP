@@ -1,0 +1,145 @@
+/* navbar colours */
+nav ul a {
+    color: inherit;
+  }
+
+.navbar-fixed {
+    height: 0px;
+}
+
+/* sidenav */
+
+.brand-logo {
+    color: #f7ca23;
+    height: 70px;
+    width: 100%;
+    object-fit: contain;
+}
+
+.logo-container {
+    border-bottom: 1px solid lightgray;
+    position: absolute; 
+    bottom: 50px;
+}
+
+header, main, footer {
+    padding-left: 300px;
+}
+
+@media only screen and (max-width : 992px) {
+    header, main, footer {
+        padding-left: 0;
+    }
+}
+
+
+/* full browser window */
+.full-height {
+    height: calc(100vh - 80px);
+    margin: 0px;
+}
+.full-width {
+    width: 99vw;
+}
+
+
+/*centre*/
+.margin-centre {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* button */
+.btn,
+.btn-large {
+  border-radius: 10px;
+}
+
+.btn-large {
+    font-size: 1.5rem;
+}
+
+
+/* colours */
+
+.primary {
+    background-color: #f5f5fa;
+}
+
+.text-primary {
+    color: #f5f5fa;
+}
+
+.accent-1 {
+    background-color: #0e143f;
+}
+
+.text-accent-1 {
+    color: #0e143f;
+}
+
+.accent-2 {
+    background-color: #f7ca23;
+}
+
+.text-accent-2 {
+    color: #f7ca23;
+}
+
+.accent-1-btn {
+    background-color: #0e143f;
+}
+
+.accent-2-btn {
+    background-color: #f7ca23;
+}
+
+.accent-1-btn:hover {
+    background-color: #1a2050;
+}
+  
+.accent-2-btn:hover {
+    background-color: #ffd747;
+}
+
+.accent-1-btn:focus {
+  background-color: #141d5c;
+}
+
+.accent-2-btn:focus {
+    background-color: #fcd64d;
+}
+
+
+nav > * ul > li{
+    color: black;
+}
+
+nav {
+    height: 80px;
+}
+
+.navlinks > li > a {
+    height: 72px;
+
+}
+
+.navlinks{
+    margin-top: 8px;
+    margin-left: 30px;
+    margin-right: 30px;
+    font-weight: 500;
+}
+
+/* Add Button */
+.addBtn {
+    float: right;
+    margin-top: 20px;
+    margin-bottom: 50px;
+  }
+  /* Add Button */
+  .addBtnClose {
+      float: right;
+    }
