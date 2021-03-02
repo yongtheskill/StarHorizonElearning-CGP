@@ -133,7 +133,7 @@ function renderQuizQuestions(quizJSON) {
         newQuestionResponse = new QuestionResponse(questionsData[k].questionType, questionsData[k].questionID);
 
         if (questionsData[k].questionType == "cb"){
-            newQuestionResponse.checkboxValues = questionsData[k].checkboxValues;
+            newQuestionResponse.checkboxValues = questionsData[k].studentCheckboxValues;
             newQuestionResponse.studentCheckboxValues = questionsData[k].studentCheckboxValues;
             newQuestionResponse.questionOptions = questionsData[k].questionOptions;
         }
@@ -149,7 +149,7 @@ function renderQuizQuestions(quizJSON) {
     function generateQuesionHTML (question, index) {
         //actual question
         var generatedHTML = `
-        <div class="row questionWrapper z-depth-2 question-div-identifier-id-${question.questionID}">
+        <div class="row questionWrapper z-depth-2 question-div-identifier-id-${question.questionID} ${(question.isCorrect === true)&&("correctAns")} ${(question.isCorrect === false)&&("wrongAns")}">
             <div class="questionContainer">
                 <div class="row  noPadding valign-wrapper">
                     <div class="input-field col s12 quesionInput">
@@ -162,17 +162,21 @@ function renderQuizQuestions(quizJSON) {
             <div class="row answerInputContainer">
                 <div class="input-field col s12 m6">
                     <select id="answerField${question.questionID}" onchange="saAnsChanged(${question.questionID})">
-                        <option value="" disabled selected>Select correct option</option>
+                        <option value="" disabled>Select correct option</option>
                         `
             question.questionOptions.forEach(function (option, index) {
                 generatedHTML += `
-                        <option value="${option}">${option}</option>\n`
+                        <option value="${option}" ${(option == question.studentResponse)&&("selected")} disabled>${option}</option>\n`
             });
             generatedHTML += `
                     </select>
                     <label>Correct Option</label>
                 </div>
             </div>`;
+
+            if (question.isAutoGraded){
+                generatedHTML += `<p>Correct answer: ${question.correctAnswer}</p>`;
+            }
             
         }
 
@@ -185,7 +189,7 @@ function renderQuizQuestions(quizJSON) {
                 generatedHTML += `
                     <p>
                         <label>
-                            <input type="checkbox" id="checkbox-question${question.questionID}-index${index}" oninput="cbAnsChanged(${question.questionID}, ${index})"/>
+                            <input type="checkbox" id="checkbox-question${question.questionID}-index${index}" oninput="cbAnsChanged(${question.questionID}, ${index})" ${(question.studentCheckboxValues[option])&&("checked")} disabled/>
                             <span>${option}</span>
                         </label>
                     </p>`;
@@ -193,27 +197,49 @@ function renderQuizQuestions(quizJSON) {
             generatedHTML += `
                 </div>
             </div>`;
+
+
+            if (question.isAutoGraded){
+                var correctOptions = "";
+                var isFirst = true;
+                for (let key in question.checkboxValues) {
+                    if(question.checkboxValues[key]){
+                        if (!isFirst){
+                            correctOptions += ",";
+                        }
+                        correctOptions += " "+key;
+                    }                    
+                    isFirst = false;
+                  }
+                generatedHTML += `<p>Correct answer:${correctOptions}</p>`
+            }
         }
 
         if (question.questionType === "sa") {
             generatedHTML += `
             <div class="row answerInputContainer">
                 <div class="input-field col s12 m6">
-                    <input id="answerField${question.questionID}"  type="text" class="validate" onfocusout="saAnsChanged(${question.questionID})">
+                    <input id="answerField${question.questionID}"  type="text" class="validate" onfocusout="saAnsChanged(${question.questionID})" value="${question.studentResponse}" readonly>
                     <label for="answerField${question.questionID}">Your answer</label>
                 </div>
             </div>`;
+
+            if (question.isAutoGraded){
+                generatedHTML += `<p>Correct answer: ${question.correctAnswer}</p>`;
+            }
         }
 
         if (question.questionType === "la") {
             generatedHTML += `
             <div class="row answerInputContainer">
                 <div class="input-field col s12">
-                    <textarea  id="answerField${question.questionID}"  type="text" class="materialize-textarea" onfocusout="saAnsChanged(${question.questionID})"></textarea>
+                    <textarea  id="answerField${question.questionID}"  type="text" class="materialize-textarea" onfocusout="saAnsChanged(${question.questionID})" readonly>${question.studentResponse}</textarea>
                     <label for="answerField${question.questionID}">Your answer</label>
                 </div>
             </div>`;
         }
+
+
 
 
         generatedHTML += `

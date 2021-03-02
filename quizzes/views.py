@@ -129,10 +129,15 @@ def createQuiz(request):
         assignedModule = Module.objects.get(pk=assignedModuleID)
 
 
+
+
         newQuiz = Quiz()
         newQuiz.quizName = request.POST['quizName']
         newQuiz.quizID = request.POST['quizID']
-        newQuiz.passingScore = request.POST['passingScore']
+        if 'passingScore' in request.POST and request.POST['passingScore'] != '':
+            newQuiz.passingScore = int(request.POST['passingScore'])
+        else:
+            newQuiz.passingScore = 0
         newQuiz.quizDueDate = sgt.localize(dueDateTime)
         newQuiz.module = assignedModule
         newQuiz.quizData = questionsJSON
@@ -199,15 +204,47 @@ def doQuiz(request, quizID):
 
     quizObj = Quiz.objects.get(quizID=quizID)
 
-    if quizObj.quizDueDate > sgt.localize(datetime.now()):
-        context = {"quizObject": Quiz.objects.get(quizID=quizID), }
+    #if quizObj.quizDueDate > sgt.localize(datetime.now()):
+    context = {"quizObject": Quiz.objects.get(quizID=quizID), }
 
-        return render(request, 'quizzes/do.html', context)
+    user = request.user
+    quizResponseJSON = user.quizResponses
+    if quizResponseJSON and "__________RESPONSESPLITTER__________" in quizResponseJSON:
+        allQuizResponses = quizResponseJSON.split("__________RESPONSESPLITTER__________")[1:]
+        for i in allQuizResponses:
+            if quizObj.quizName == json.loads(i)[0]["quizName"]:
+                #quiz done already
+
+                
+                def searchForQn(questions, questionID):
+                    for i in questions:
+                        if i["questionID"] == questionID:
+                            return i
+
+
+
+
+                quizObjToCombine = json.loads(Quiz.objects.get(quizID=quizID).quizData)
+
+                quizResponsesToCombine = json.loads(i)[1:]
+
+                for j in quizObjToCombine:
+                    j.update(searchForQn(quizResponsesToCombine, j["questionID"]))
+                    print(j)                    
+
+                print ("Q1: ", searchForQn(quizObjToCombine, 1))
+
+
+                context = {"quizObject": Quiz.objects.get(quizID=quizID), "responsesObject": json.dumps(quizObjToCombine), }
+                return render(request, 'quizzes/viewAns.html', context)
+    return render(request, 'quizzes/do.html', context)
+"""
     else:
 
         classes = list(request.user.classes.all())
         context = {"classes": classes, "error": "Quiz is over.", }
         return render(request, 'accountManagement/classListView.html', context)
+        """
 
     
 

@@ -174,7 +174,8 @@ def courseView(request, courseId):
             for i in allQuizResponses:
                 for j in allQuizzes:
                     if j.quizName == json.loads(i)[0]["quizName"]:
-                        allQuizzes.remove(j)
+                        #allQuizzes.remove(j)
+                        pass
 
 
         module.quizzesNew, module.quizzesOld = newnessChecker( allQuizzes )

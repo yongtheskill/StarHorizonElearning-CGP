@@ -53,7 +53,7 @@
       <li><a href='/login/'>Login</a></li>
       {% endif %}
     
-      <a href="/" style="padding-bottom: 25px;" class="logo-container"><img class="brand-logo" src="{% static "img/StarHorizonLogoDark.png" %}" alt="Gotutor Logo"></a>
+      <a href="/" style="padding-bottom: 25px;" class="logo-container"><img class="brand-logo" src="{% static "img/cgpLogo.png" %}" alt="Gotutor Logo"></a>
     </ul>
     
     <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons" style="font-size: xx-large; padding-left: 15px; padding-top: 10px;">menu</i></a>
@@ -65,11 +65,12 @@
       }
     </style>
     <!-- navbar -->
-      <nav class="white black-text">
+      <nav class="white black-text" style="box-shadow: none;">
           <div class="nav-wrapper black-text">
-            <a href="/"><img class="left" style="height: 65px; margin-top: 10px; margin-left: 40px; color: #f7ca23;" src="{% if isHome %}{% static "img/StarHorizonLogoDark.png" %}{% else %}{% static "img/StarHorizonLogoDark.png" %}{% endif %}"
+            <a href="/"><img class="left" style="height: 50px; margin-top: 15px; margin-left: 40px; color: #f7ca23;" src="{% if isHome %}{% static "img/cgpLogo.png" %}{% else %}{% static "img/cgpLogo.png" %}{% endif %}"
               alt="Gotutor Logo"></a>
             <ul class="navlinks right hide-on-med-and-down black-text">
+              <li><a href='https://www.cgp-personnel.sg/'>Home</a></li>
               <!-- if teacher -->
               {% if user.accountType == "Teacher" %}
               <li><a href="/live/">Live Streaming</a></li>
@@ -93,6 +94,7 @@
           </div>
 
         <ul id="slide-out" class="sidenav sidenav-fixed hide-on-large-only">
+          <li><a href='https://www.cgp-personnel.sg/'>Home</a></li>
           {% if user.is_authenticated %}
           <li><div class="user-view">
             <div class="background">
@@ -121,7 +123,7 @@
           <li><a href='/login/' style="padding-top: 50px;">Login</a></li>
           {% endif %}
         
-          <a href="/" style="height: 25px; position: absolute; bottom: 50px;" class="logo-container"><img class="brand-logo" src="{% static "img/StarHorizonLogoDark.png" %}" alt="Star Horizon Logo"></a>
+          <a href="/" style="height: 25px; position: absolute; bottom: 50px;" class="logo-container"><img class="brand-logo" src="{% static "img/cgpLogo.png" %}" alt="Star Horizon Logo"></a>
         </ul>
       </nav>
     {% endif %}

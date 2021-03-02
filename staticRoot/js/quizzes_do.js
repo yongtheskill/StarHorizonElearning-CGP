@@ -153,7 +153,7 @@ function renderQuizQuestions(quizJSON) {
             <div class="questionContainer">
                 <div class="row  noPadding valign-wrapper">
                     <div class="input-field col s12 quesionInput">
-                        <h4 style="margin: 0px;" id="questionNumberLabel${question.questionID}">${index + 1}. ${question.questionTitle}</h4>
+                        <h6 style="margin: 0px;" id="questionNumberLabel${question.questionID}">${index + 1}. ${question.questionTitle}</h4>
                     </div>
                 </div>`;
 
