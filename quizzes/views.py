@@ -321,6 +321,10 @@ def editQuiz(request, quizID):
         #find matching course
 
         newQuiz = Quiz.objects.get(quizID=request.POST['quizID'])
+        if 'passingScore' in request.POST and request.POST['passingScore'] != '':
+            newQuiz.passingScore = int(request.POST['passingScore'])
+        else:
+            newQuiz.passingScore = 0
         newQuiz.quizName = request.POST['quizName']
         newQuiz.quizDueDate = sgt.localize(dueDateTime)
         newQuiz.quizData = questionsJSON
