@@ -77,7 +77,7 @@
             {% for quizName, score in quizResults.items %}
             <tr>
                 <td>
-                    <a href="/account/{{ tempUser.id }}/{{ quizName }}"> {{ quizName }} </a>
+                    <a href="/quizzes/viewAns/{{ quizName }}/{{ tempUser.id }}"> {{ quizName }} </a>
                 </td>
                 <td>{{ score }}</td>
             </tr>

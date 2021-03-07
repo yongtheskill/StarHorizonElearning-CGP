@@ -246,7 +246,58 @@ def doQuiz(request, quizID):
         return render(request, 'accountManagement/classListView.html', context)
         """
 
-    
+
+
+
+
+
+
+
+
+@login_required
+def viewQuizAns(request, quizName, userId):   
+
+    quizObj = Quiz.objects.get(quizName=quizName)
+
+    user = User.objects.get(id = userId)
+    quizResponseJSON = user.quizResponses
+    if quizResponseJSON and "__________RESPONSESPLITTER__________" in quizResponseJSON:
+        allQuizResponses = quizResponseJSON.split("__________RESPONSESPLITTER__________")[1:]
+        for i in allQuizResponses:
+            if quizObj.quizName == json.loads(i)[0]["quizName"]:
+                #quiz done already
+
+                
+                def searchForQn(questions, questionID):
+                    for i in questions:
+                        if i["questionID"] == questionID:
+                            return i
+
+
+
+
+                quizObjToCombine = json.loads(quizObj.quizData)
+
+                quizResponsesToCombine = json.loads(i)[1:]
+
+                for j in quizObjToCombine:
+                    j.update(searchForQn(quizResponsesToCombine, j["questionID"]))
+                    print(j)
+
+
+                context = {"quizObject": quizObj, "responsesObject": json.dumps(quizObjToCombine), }
+                return render(request, 'quizzes/viewAns.html', context)
+    else:
+        return doQuiz(request, quizObj.quizID)
+
+
+
+
+
+
+
+
+
 
 
 

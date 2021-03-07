@@ -277,6 +277,7 @@ def individualAccountView(request, userId):
             score = len(re.findall(r'"isCorrect": true', i))
 
             quizResults[json.loads(i)[0]["quizName"]] = "{}/{}".format(score, fullScore)
+
         context = {"tempUser": user, "classes": classes, "quizResults": quizResults, "timeOnline": timeOnline}
     else:
         context = {"tempUser": user, "classes": classes, "timeOnline": timeOnline}
