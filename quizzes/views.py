@@ -7,6 +7,8 @@ from accountManagement.models import Course, Module, User
 import json
 import re
 
+import base64
+
 import pytz
 sgt = pytz.timezone('Asia/Singapore')
 from datetime import datetime
@@ -255,7 +257,9 @@ def doQuiz(request, quizID):
 
 
 @login_required
-def viewQuizAns(request, quizName, userId):   
+def viewQuizAns(request, quizNameEncoded, userId):   
+    quizName = base64.b64decode(quizNameEncoded).decode('utf-8')
+    print(quizName)
 
     quizObj = Quiz.objects.get(quizName=quizName)
 

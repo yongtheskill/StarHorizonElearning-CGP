@@ -65,27 +65,30 @@
     <!-- LIST VIDEOS -->
 
     <div id="all" class="col s12">
-        <table style="margin-top: 10px;">
-            <thead>
-              <tr>
-                  <th>Video Name</th>
-                  <th>Video ID</th>
-                  <th>View Video</th>
-                  <th>Edit Details</th>
-              </tr>
-            </thead>
-    
-            <tbody>
-                {% for i in videoLessonObjects %}
-                <tr>
-                    <td>{{ i.videoName }}</td>
-                    <td>{{ i.videoID }}</td>
-                    <td><a href="../view/{{ i.videoID }}"><i class="material-icons text-accent-1">visibility</i></a></td>
-                    <td><a onclick="goToEditPage('{{ i.videoID }}')" href="#"><i class="material-icons text-accent-1">edit</i></a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div style="overflow-y: scroll; height: 100%;">
+            <table style="margin-top: 10px;">
+                <thead>
+                  <tr>
+                      <th>Video Name</th>
+                      <th>Video ID</th>
+                      <th>View Video</th>
+                      <th>Edit Details</th>
+                  </tr>
+                </thead>
+        
+                <tbody>
+                    {% for i in videoLessonObjects %}
+                    <tr>
+                        <td>{{ i.videoName }}</td>
+                        <td>{{ i.videoID }}</td>
+                        <td><a href="../view/{{ i.videoID }}"><i class="material-icons text-accent-1">visibility</i></a></td>
+                        <td><a onclick="goToEditPage('{{ i.videoID }}')" href="#"><i class="material-icons text-accent-1">edit</i></a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        
+        </div>
     </div>
 
 

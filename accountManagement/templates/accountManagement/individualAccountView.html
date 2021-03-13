@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% load misc_tags %}
+
 {% block title %}Individual View{% endblock %}
 
 {% block content %}
@@ -77,7 +79,7 @@
             {% for quizName, score in quizResults.items %}
             <tr>
                 <td>
-                    <a href="/quizzes/viewAns/{{ quizName }}/{{ tempUser.id }}"> {{ quizName }} </a>
+                    <a href="/quizzes/viewAns/{{ quizName|b64encode }}/{{ tempUser.id|urlencode:"" }}"> {{ quizName }} </a>
                 </td>
                 <td>{{ score }}</td>
             </tr>

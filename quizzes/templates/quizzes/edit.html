@@ -207,6 +207,7 @@ function createQuestion (qType) {
     $("#allQuesitonsContainer").append(generateQuesionHTML(newQuestion));
     updateNumberedList();
     initialiseChips(qType, availableQuestionID, false, newQuestion);
+    $("#id_passingScore").attr("max", questions.length);
 }
 
 function initialiseChips (qType, qID, isExistingQn, question){
@@ -459,7 +460,7 @@ function generateAutoGrade(question){
                     <option value="" disabled ${hintSelectedHTML}>Select correct option</option>
                     `;
         question.questionOptions.forEach(function (option, index) {
-            if (index == question.correctAnswer){
+            if (option == question.correctAnswer){
                 var isSelectedHTML = "selected";
             }
             else {
