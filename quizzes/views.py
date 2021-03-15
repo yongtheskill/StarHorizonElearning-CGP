@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from .models import Quiz
@@ -179,7 +179,6 @@ def doQuiz(request, quizID):
         
         quizObj = Quiz.objects.get(quizName=responsesJSON[0]["quizName"])
         passingScore = quizObj.passingScore
-        print(quizObj)
         if score >= int(passingScore):
             responsesJSON[0]["isPassed"] = True
         else:
@@ -200,9 +199,7 @@ def doQuiz(request, quizID):
         user.save()
         
 
-        classes = list(request.user.classes.all())
-        context = {"classes": classes, "notification": "Quiz Submitted", }
-        return render(request, 'accountManagement/classListView.html', context)
+        return redirect("./")
 
     quizObj = Quiz.objects.get(quizID=quizID)
 
@@ -232,9 +229,6 @@ def doQuiz(request, quizID):
 
                 for j in quizObjToCombine:
                     j.update(searchForQn(quizResponsesToCombine, j["questionID"]))
-                    print(j)                    
-
-                print ("Q1: ", searchForQn(quizObjToCombine, 1))
 
 
                 context = {"quizObject": Quiz.objects.get(quizID=quizID), "responsesObject": json.dumps(quizObjToCombine), }
@@ -259,7 +253,6 @@ def doQuiz(request, quizID):
 @login_required
 def viewQuizAns(request, quizNameEncoded, userId):   
     quizName = base64.b64decode(quizNameEncoded).decode('utf-8')
-    print(quizName)
 
     quizObj = Quiz.objects.get(quizName=quizName)
 
@@ -286,7 +279,6 @@ def viewQuizAns(request, quizNameEncoded, userId):
 
                 for j in quizObjToCombine:
                     j.update(searchForQn(quizResponsesToCombine, j["questionID"]))
-                    print(j)
 
 
                 context = {"quizObject": quizObj, "responsesObject": json.dumps(quizObjToCombine), }

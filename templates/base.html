@@ -22,6 +22,9 @@
     * {
       font-family: "Montserrat", "Roboto";
     }
+    a.markVisited:visited {
+      color: #3a718d;
+    }
   </style>
   
   <body>
@@ -67,10 +70,9 @@
     <!-- navbar -->
       <nav class="white black-text" style="box-shadow: none;">
           <div class="nav-wrapper black-text">
-            <a href="/"><img class="left" style="height: 50px; margin-top: 15px; margin-left: 40px; color: #f7ca23;" src="{% if isHome %}{% static "img/cgpLogo.png" %}{% else %}{% static "img/cgpLogo.png" %}{% endif %}"
-              alt="Gotutor Logo"></a>
+            <a href="https://www.cgp-personnel.sg/"><img class="left" style="height: 50px; margin-top: 15px; margin-left: 40px; color: #f7ca23;" src="{% if isHome %}{% static "img/cgpLogo.png" %}{% else %}{% static "img/cgpLogo.png" %}{% endif %}"
+              alt="Logo"></a>
             <ul class="navlinks right hide-on-med-and-down black-text">
-              <li><a href='https://www.cgp-personnel.sg/'>Home</a></li>
               <!-- if teacher -->
               {% if user.accountType == "Teacher" %}
               <li><a href="/live/">Live Streaming</a></li>

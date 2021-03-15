@@ -122,6 +122,7 @@ function initQuestions (quizJSON){
         autoGradeInit(questions[k]);
         M.updateTextFields();
         updateNumberedList();
+        $("#id_passingScore").attr("max", questions.length);
     }
 }
 
