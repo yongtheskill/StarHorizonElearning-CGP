@@ -189,6 +189,19 @@ def doQuiz(request, quizID):
         userId = request.user.id
         user = User.objects.get(id = userId)
         currentQuizResponses = user.quizResponses
+
+        if currentQuizResponses and "__________RESPONSESPLITTER__________" in currentQuizResponses:
+            allQuizResponses = currentQuizResponses.split("__________RESPONSESPLITTER__________")[1:]
+            for i in allQuizResponses:
+                quizName = ""
+                try:
+                    quizName = json.loads(i)[0]["quizName"]
+                    print(quizObj.quizName)
+                    if quizName == quizObj.quizName:
+                        return redirect("./")
+                except:
+                    pass
+
         if currentQuizResponses != None:
             currentQuizResponses = str(user.quizResponses)
         else:

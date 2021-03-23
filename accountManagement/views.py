@@ -136,6 +136,7 @@ def classView(request, classId):
                 try:
                     quizName = json.loads(i)[0]["quizName"]
                     quizCounts[quizName] += 1
+                    print(str(quizName) + user.username)
                     if json.loads(i)[0]["isPassed"]:
                         quizCountsPass[quizName] += 1
                 except:
