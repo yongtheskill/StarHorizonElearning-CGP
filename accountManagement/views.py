@@ -155,9 +155,12 @@ def classView(request, classId):
 # View list of classes participating in a course, as well as course materials
 @login_required
 def courseView(request, courseId):
+    user = request.user
 
     course = Course.objects.get(id = courseId)
     classes = list(StudentClass.objects.filter(courses = courseId))
+    ownClasses = [x for x in classes if x in list(user.classes.all())]
+    otherClasses = [x for x in classes if not x in list(user.classes.all())]
     modules = list(Module.objects.filter(course = courseId))
 
 
@@ -166,7 +169,6 @@ def courseView(request, courseId):
         allQuizzes = list(Quiz.objects.filter(module = module))
 
 
-        user = request.user
         quizResponseJSON = user.quizResponses
         if quizResponseJSON and "__________RESPONSESPLITTER__________" in quizResponseJSON:
             allQuizResponses = quizResponseJSON.split("__________RESPONSESPLITTER__________")[1:]
@@ -183,7 +185,7 @@ def courseView(request, courseId):
         module.fileUploadsNew, module.fileUploadsOld = newnessChecker( list(FileUpload.objects.filter(module = module)) )
 
 
-    context = {"course": course, "classes": classes, "modules": modules, }
+    context = {"course": course, "ownClasses": ownClasses, "otherClasses": otherClasses, "modules": modules, }
 
     return render(request, 'accountManagement/courseView.html', context)
 

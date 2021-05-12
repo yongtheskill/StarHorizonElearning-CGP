@@ -18,10 +18,18 @@
     </thead>
 
     <tbody>
-        {% for i in classes %}
+        {% for i in ownClasses %}
         <tr>
             <td>
                 <a href="/class/{{ i.id }}/accounts">{{ i.className }}</a>
+            </td>
+            <td>{{ i.classInstitution }}</td>
+        </tr>
+        {% endfor %}
+        {% for i in otherClasses %}
+        <tr>
+            <td>
+                {{ i.className }}
             </td>
             <td>{{ i.classInstitution }}</td>
         </tr>
