@@ -32,3 +32,16 @@ class Quiz(models.Model):
 
     def __str__(self):
          return self.quizName
+
+class Question(models.Model):
+    questionId = models.BigAutoField(primary_key=True)
+    questionName = models.CharField(max_length=200, verbose_name="question name")
+    creationDate = models.DateTimeField(auto_now_add=True)
+
+    questionData = models.CharField(max_length=10000000, verbose_name="question data")
+
+    class Meta:
+        verbose_name_plural = "Question bank questions"
+
+    def __str__(self):
+         return self.questionName

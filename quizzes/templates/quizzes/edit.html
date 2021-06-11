@@ -75,6 +75,7 @@
                     <li><a onclick="createQuestion('la')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">subject</i>Long Answer</a></li>
                     <li><a onclick="createQuestion('mc')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">radio_button_checked</i>Multiple Choice</a></li>
                     <li><a onclick="createQuestion('cb')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">check_box</i>Checkboxes</a></li>
+                    <li><a href="#modal1" class="btn-floating accent-1-btn btn-override modal-trigger"><i class="material-icons left">receipt_long</i>Question Bank</a></li>
                 </ul>
             </div>
             <a class="submitButton accent-1-btn waves-effect waves-light btn" style="margin-top: 5px;" onclick="submitForm()"><i class="material-icons right">done</i>save changes</a>
@@ -92,6 +93,20 @@
     </form>
 </div>
 
+<div id="modal1" class="modal modal-fixed-footer">
+  <div class="modal-content">
+      <h4>Add question from bank</h4>      
+      <div class="collection">
+          {% for question in qbank %}
+          <a href="#" onclick="getBankQuestion({{question.pk}});" class="collection-item">{{question.questionName}}</a>
+          {% endfor %}
+      </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+  </div>
+</div>
+
 
 {% endblock %}
 
@@ -100,6 +115,36 @@
 
 {% block javascript %}
 <script>
+$( document ).ready(function() {
+    
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems, {});
+});
+
+function getBankQuestion(questionID){
+    url = "/quizzes/bank/get/"+questionID;
+    $.ajax({url: url, success:addQuestionData });
+
+    var instance = M.Modal.getInstance($('#modal1'));
+    instance.close();
+}
+
+function addQuestionData(qData){
+    
+    availableQuestionID += 1;
+    qData["questionID"] = availableQuestionID;
+
+    questions.push(qData);
+
+    $("#allQuesitonsContainer").append(generateQuesionHTML(qData));
+    initialiseChips(qData.questionType, qData.questionID, true, qData);
+    autoGradeInit(qData);
+    M.updateTextFields();
+    updateNumberedList();
+    $("#id_passingScore").attr("max", questions.length);
+    tagSet(qData);
+}
+
 
 $( document ).ready(function() {
     initQuestions ('{{ quizObject.quizData |safe }}');
@@ -110,9 +155,11 @@ $( document ).ready(function() {
     $('select').formSelect();
 });
 
+var tags = { "{{ module.pk }}": [{{ availableTags|safe }}, ] };
 var questions = [];
 var availableQuestionID = 0;
 function initQuestions (quizJSON){
+
     questions = JSON.parse(quizJSON);
     
     availableQuestionID = questions[questions.length-1].questionID;
@@ -123,6 +170,7 @@ function initQuestions (quizJSON){
         M.updateTextFields();
         updateNumberedList();
         $("#id_passingScore").attr("max", questions.length);
+        tagSet(questions[k])
     }
 }
 
@@ -133,6 +181,13 @@ class Question {
         this._____var__questionType = qType;
 
         this._____var__questionID = qID;
+    }
+
+    get questionTag(){
+        return this._____var__questionTag;
+    }
+    set questionTag(x){
+        this._____var__questionTag = x;
     }
 
     get questionType(){
@@ -198,6 +253,55 @@ class Question {
         this._____var__questionID = x;
     }
 
+}
+
+
+function tagSet(data){
+    console.log(data);
+
+    selectedTag = data["questionTag"];
+
+    assignedModule = {{ module.pk }};
+
+    if (selectedTag === "" || selectedTag == undefined){
+        selectOptions = `
+        <option value="" disabled selected>Choose question tag</option>
+        `;
+    }
+    else{
+        selectOptions = `
+        <option value="" disabled>Choose question tag</option>
+        `;
+    }
+    if (tags[assignedModule] === undefined){
+        selectOptions += `<option value="" selected>this module has no tags</option>`;
+    }
+    else {
+        tags[assignedModule].forEach(function (option, index) {
+            if(option === selectedTag){
+                selectOptions += `
+                        <option value="${index.toString()}" selected>${option}</option>\n`;
+            }
+            else{
+                selectOptions += `
+                        <option value="${index.toString()}">${option}</option>\n`;
+            }
+        });
+    }
+    $('#questionTag-'+data["questionID"]).html(selectOptions);
+    $('#questionTag-'+data["questionID"]).formSelect();
+}
+
+function tagChanged (qID) {
+    let question = questions.find((o, i) => {
+        if (o.questionID === qID) {
+            return true; // stop searching
+        }
+    });
+    var e = document.getElementById("questionTag-" + question.questionID);
+    var selectedTag = e.options[e.selectedIndex].text;
+    
+    question.questionTag = selectedTag;
 }
 
 
@@ -337,6 +441,11 @@ function generateQuesionHTML (question) {
                 </div>
             </div>
             <div class="row right-align noPadding" style="padding-right: 10px;">
+                <div class="input-field col s12 m6">
+                    <select id="questionTag-${question.questionID}" class="questionTag" onChange="tagChanged(${question.questionID})">
+                    </select>
+                    <label>Question Tag</label>
+                </div>
                 <a class="btn-flat"><i style="font-size: 2rem;" class="material-icons large red-text" onclick="deleteQuestion(${question.questionID})">delete</i></a>
             </div>`;
 
@@ -513,10 +622,51 @@ function convertToJSON() {
 }
 
 function submitForm() {
-    convertToJSON();
-    $("#quizDataForm").submit();
+    questionsValid = validateQuestions()
+    if(questions.length < 0){
+        const errorNotification = window.createNotification({
+            theme: 'warning',
+        });
+        // Invoke success notification
+        errorNotification({ 
+            message: 'Please add at least one question' 
+        });
+    }
+    else if (!questionsValid){
+        const errorNotification = window.createNotification({
+            theme: 'warning',
+        });
+        // Invoke success notification
+        errorNotification({ 
+            message: 'Please ensure questions are filled in' 
+        });
+    }
+    else {
+        convertToJSON();
+        $("#quizDataForm").submit();
+    }
 }
 
+
+function validateQuestions(){
+    for(const question of questions){
+        console.log(question);
+        if(question.questionType==="sa" || question.questionType==="la"){
+            if($.isEmptyObject(question.questionTitle)){
+                return false;
+            }
+        }
+        else if(question.questionType==="cb" || question.questionType==="mc"){
+            if($.isEmptyObject(question.questionTitle)){
+                return false;
+            }
+            else if($.isEmptyObject(question.questionOptions)){
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
     $(document).ready(function(){
         $('select').formSelect();

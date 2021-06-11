@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
-from .models import Quiz
+from .models import Quiz, Question
 from accountManagement.models import Course, Module, User
 
 import json
@@ -13,6 +13,189 @@ import pytz
 sgt = pytz.timezone('Asia/Singapore')
 from datetime import datetime
 
+from openpyxl import Workbook
+from django.http import HttpResponse, JsonResponse
+
+
+
+
+
+@login_required
+def bankGet(request, questionID):
+    question = Question.objects.filter(pk=questionID)[0]
+
+    return JsonResponse(json.loads(question.questionData))
+
+
+
+
+@login_required
+def bankDelete(request, questionID):
+    qtd = Question.objects.filter(pk=questionID)
+    try:
+        qtd.delete()
+    except:
+        context = {"questionObjects": Question.objects.all, "error": "Error deleting question, please do not use the back button or refresh the page"}
+    context = {"questionObjects": Question.objects.all, "notification": "Successfully deleted question"}
+
+    return render(request, 'quizzes/manageBank.html', context)
+
+#quiz creation page
+@login_required
+def bankCreate(request):
+   
+    #if submitting form
+    if request.method == 'POST':
+        qJSON = request.POST['allQuestionsJSON']
+        qJSON = re.sub("_____var__", "", qJSON) #remove js stuff
+        qData = json.loads(qJSON)[0]
+        print(qData)
+        questionName = qData['questionTitle']
+
+        if Question.objects.filter(questionName=questionName):
+            context = {"questionObjects": Question.objects.all, "error": "This question name is already being used, please choose a new question name."}
+            return render(request, 'quizzes/manageBank.html', context)
+
+
+        newQuestion = Question()
+        newQuestion.questionName = questionName
+        newQuestion.questionData = json.dumps(qData)
+        newQuestion.save()
+        
+        context = {"questionObjects": Question.objects.all, "notification": "Successfully created questions"}
+        return render(request, 'quizzes/manageBank.html', context)
+
+
+    else:
+        
+        context = {}
+        return render(request, 'quizzes/bankCreate.html', context)
+
+
+
+
+
+
+
+
+
+#quiz management page
+@login_required
+def downloadQuiz(request):
+    try:
+        selectedId = request.GET["id"]
+    except:
+        selectedId = ""
+
+    context = {"quizObjects": Quiz.objects.all, "selectedId": selectedId}
+
+    return render(request, 'quizzes/download.html', context)
+
+
+
+@login_required
+def exportQuiz(request):
+
+    wb = Workbook()
+    qte = Quiz.objects.get(quizID=request.GET["id"])    
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="{}.xlsx"'.format(qte.quizID)
+    quizName = qte.quizName
+    passingScore = qte.passingScore
+
+    qte = json.loads(qte.quizData)
+    ws = wb.active
+    
+    #format header
+    baseHeader = ["Class", "Name", "Designation", "Start Date", "QuizName", "Score", "Competency"]
+    quizLen = len(qte)
+    qLi = []
+    qtLi = []
+    qTags = []
+
+    for i in range(quizLen):
+        qLi.append("Q"+ str(i+1))
+        qtLi.append("Q"+ str(i+1) + "Tag")
+        try:
+            qTags.append(qte[i]["questionTag"])
+        except:
+            qTags.append("")
+    
+    baseHeader += qLi
+    baseHeader += qtLi
+    
+    ws.append(baseHeader)
+
+    allUsers = list(User.objects.all())
+
+    #for user in allUsers:
+    for user in allUsers:
+        quizResponseJSON = user.quizResponses
+        if quizResponseJSON and "__________RESPONSESPLITTER__________" in quizResponseJSON:
+            allQuizResponses = quizResponseJSON.split("__________RESPONSESPLITTER__________")[1:]
+
+            for i in allQuizResponses:
+                quizData = json.loads(i)
+                if quizData[0]["quizName"] == quizName:
+                    newLine = []
+
+                    try:
+                        newLine.append(str(user.classes.all()[0]))
+                    except:
+                        newLine.append("")
+
+                    try:
+                        newLine.append(user.first_name + " " + user.last_name)
+                    except:
+                        newLine.append("")
+                    
+                    try:
+                        newLine.append(user.designation)
+                    except:
+                        newLine.append("")
+                    
+                    try:
+                        newLine.append(str(user.startDate))
+                    except:
+                        newLine.append("")
+                    
+                    try:
+                        newLine.append(quizName)
+                    except:
+                        newLine.append("")
+
+                    score = len(re.findall(r'"isCorrect": true', i))
+                    newLine.append(str(score))
+                    if(score >= passingScore):
+                        newLine.append("Competent")
+                    else:
+                        newLine.append("Not Yet Competent")
+
+                    correctData = []
+                    for j in quizData[1:]:
+                        if j["isCorrect"]:
+                            correctData.append("1")
+                        else:
+                            correctData.append("0")
+
+                    newLine += correctData
+                    newLine += qTags
+
+                    ws.append(newLine)
+                            
+
+
+
+
+    wb.save(response)
+    return response
+                
+
+def tryAppend(l, data):
+    try:
+        l.append(data)
+    except:
+        l.append("")
 
 
 #quiz management page
@@ -27,6 +210,17 @@ def manageQuizzes(request):
     context = {"quizObjects": Quiz.objects.all, "anyDue": anyDue}
 
     return render(request, 'quizzes/manage.html', context)
+
+
+
+#quiz management page
+@login_required
+def manageBank(request):
+
+
+    context = {"questionObjects": Question.objects.all,}
+
+    return render(request, 'quizzes/manageBank.html', context)
     
 
 
@@ -96,7 +290,7 @@ def createQuiz(request):
     courseObjects = list(Course.objects.all())
     courseIDs = [i.id for i in courseObjects]
 
-    context = {"quizIDtoUse": "quiz%s" % (timestamp), "courseObjects": courseObjects, "courseIDs": courseIDs ,"moduleObjects": modules, }
+    context = {"qbank": Question.objects.all, "quizIDtoUse": "quiz%s" % (timestamp), "courseObjects": courseObjects, "courseIDs": courseIDs ,"moduleObjects": modules, }
     
     #if submitting form
     if request.method == 'POST':
@@ -196,7 +390,6 @@ def doQuiz(request, quizID):
                 quizName = ""
                 try:
                     quizName = json.loads(i)[0]["quizName"]
-                    print(quizObj.quizName)
                     if quizName == quizObj.quizName:
                         return redirect("./")
                 except:
@@ -351,11 +544,14 @@ def editQuiz(request, quizID):
 
         passingScore = quizObj.passingScore
 
+        module = quizObj.module
+        availableTags = ", ".join( ['"{}"'.format(x) for x in list(set(list(module.course.quizTags.split(","))))] )
+
         
         courseObjects = list(Course.objects.all())
         courseIDs = [i.id for i in courseObjects]
 
-        context = {"courseObjects": courseObjects, "courseIDs": courseIDs ,"modObjects": Module.objects.all, "quizObject": quizObj, "dueDate": dueDate, "dueTime": dueTime, "passingScore": passingScore}
+        context = {"qbank": Question.objects.all, "courseObjects": courseObjects, "courseIDs": courseIDs ,"modObjects": Module.objects.all, "quizObject": quizObj, "dueDate": dueDate, "dueTime": dueTime, "passingScore": passingScore, "availableTags": availableTags, "module": module}
         return render(request, 'quizzes/edit.html', context)
     
 

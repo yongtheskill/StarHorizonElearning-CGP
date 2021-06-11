@@ -64,6 +64,9 @@ class User(AbstractUser):
     quizResponses = models.CharField(max_length=1000000000, verbose_name="quizResponses", null=True, blank=True)
 
     timeOnline = models.DurationField(verbose_name="timeOnline", blank=True, null=True)
+
+    startDate = models.DateField(blank=True, null=True, verbose_name="Start date")
+    designation = models.CharField(max_length=500, blank=True, null=True)
     
 
     def __str__(self):

@@ -41,18 +41,19 @@ SECURE_SSL_REDIRECT = False
 # Application definition
 
 INSTALLED_APPS = [
-    'home.apps.HomeConfig',
-    'accountManagement.apps.AccountmanagementConfig',
-    'videoLessons.apps.VideolessonsConfig',
-    'quizzes.apps.QuizzesConfig',
-    'fileUploads.apps.FileuploadsConfig',
-    'liveLesson.apps.LivelessonConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'home.apps.HomeConfig',
+    'accountManagement.apps.AccountmanagementConfig',
+    'videoLessons.apps.VideolessonsConfig',
+    'quizzes.apps.QuizzesConfig',
+    'fileUploads.apps.FileuploadsConfig',
+    'liveLesson.apps.LivelessonConfig',
 
     'storages',
 ]

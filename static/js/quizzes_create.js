@@ -6,6 +6,15 @@ class Question {
         this._____var__questionType = qType;
 
         this._____var__questionID = qID;
+
+        this._____var__questionTag = "";
+    }
+
+    get questionTag(){
+        return this._____var__questionTag;
+    }
+    set questionTag(x){
+        this._____var__questionTag = x;
     }
 
     get questionType(){
@@ -78,6 +87,22 @@ var availableQuestionID = 0;
 
 var questions = [];
 
+
+
+function tagChanged (qID) {
+    let question = questions.find((o, i) => {
+        if (o.questionID === qID) {
+            return true; // stop searching
+        }
+    });
+    var e = document.getElementById("questionTag-" + question.questionID);
+    var selectedTag = e.options[e.selectedIndex].text;
+    
+    question.questionTag = selectedTag;
+}
+
+
+
 function createQuestion (qType) {
     availableQuestionID += 1;
     newQuestion = new Question(qType, availableQuestionID);
@@ -85,7 +110,7 @@ function createQuestion (qType) {
     $("#allQuesitonsContainer").append(generateQuesionHTML(newQuestion));
     updateNumberedList();
     initialiseChips(qType, availableQuestionID);
-    moduleChanged();
+    moduleChangedQ(availableQuestionID);
     $('select').formSelect();
     $("#id_passingScore").attr("max", questions.length);
 }
@@ -140,7 +165,6 @@ function chipsEdited(qID){
         }
         
         question.checkboxValues = newCheckboxData;
-        console.log(studentCheckboxData);
         question.studentCheckboxValues = studentCheckboxData;
     }
 
@@ -183,6 +207,10 @@ function generateQuesionHTML (question) {
         var questionTypeLabel = "Checkboxes"
     }
 
+    if (question.questionTitle === undefined){
+        question.questionTitle = "";
+    }
+
 
     //actual question
     var generatedHTML = `
@@ -191,7 +219,7 @@ function generateQuesionHTML (question) {
             <div class="row  noPadding valign-wrapper">
                 <div class="input-field col s12 m10 quesionInput">
                     <h1 style="margin: 0px;" id="questionNumberLabel${question.questionID}" class="prefix"></h1>
-                    <textarea onfocusout="questionChanged(${question.questionID})" id="QuestionTitle${question.questionID}" class="materialize-textarea"></textarea>
+                    <textarea onfocusout="questionChanged(${question.questionID})" id="QuestionTitle${question.questionID}" class="materialize-textarea" >${question.questionTitle}</textarea>
                     <label for="QuestionTitle${question.questionID}">Question</label>
                 </div>
                 <div class="col s5 m2">
@@ -200,7 +228,7 @@ function generateQuesionHTML (question) {
             </div>
             <div class="row right-align noPadding" style="padding-right: 10px;">
                 <div class="input-field col s12 m6">
-                    <select id="questionTag" class="questionTag">
+                    <select id="questionTag-${question.questionID}" class="questionTag" onChange="tagChanged(${question.questionID})">
                     </select>
                     <label>Question Tag</label>
                 </div>
@@ -217,12 +245,18 @@ function generateQuesionHTML (question) {
 
     //autograde selector
     if (question.questionType != "la"){
+        if (question.isAutoGraded === true){
+            var autoGradeCheckHTML = "checked"
+        }
+        else {
+            var autoGradeCheckHTML = ""
+        }
         generatedHTML += `
             <div class="row" style="padding-left: 20px;">
                 <div class="switch">
                     Auto-grade answer
                     <label >
-                        <input onchange="autoGradeAdd(${question.questionID})" type="checkbox">
+                        <input onchange="autoGradeAdd(${question.questionID})" type="checkbox" ${autoGradeCheckHTML}>
                         <span class="lever"></span>
                     </label>
                 </div>
@@ -290,10 +324,13 @@ function cbValidationChanged(qID, checkboxIndex) {
 function generateAutoGrade(question){
     var generatedHTML = "";
     if (question.questionType === "sa"){
+        if (question.correctAnswer === undefined){
+            question.correctAnswer = "";
+        }
         generatedHTML += `
         <div class="row autoGradeContainer">
             <div class="input-field col s12 m6">
-                <input id="validationAnswer${question.questionID}"  type="text" class="validate" onfocusout="saValidationChanged(${question.questionID})">
+                <input id="validationAnswer${question.questionID}"  type="text" class="validate" onfocusout="saValidationChanged(${question.questionID})" value="${question.correctAnswer}">
                 <label class="active" for="validationAnswer${question.questionID}">Answer to check against</label>
             </div>
         </div>`;
@@ -352,11 +389,8 @@ function convertToJSON() {
 }
 
 function submitForm() {
-    if(questions.length > 0){
-        convertToJSON();
-        $("#quizDataForm").submit();
-    }
-    else{
+    questionsValid = validateQuestions()
+    if(questions.length < 0){
         const errorNotification = window.createNotification({
             theme: 'warning',
         });
@@ -365,23 +399,52 @@ function submitForm() {
             message: 'Please add at least one question' 
         });
     }
+    else if (!questionsValid){
+        const errorNotification = window.createNotification({
+            theme: 'warning',
+        });
+        // Invoke success notification
+        errorNotification({ 
+            message: 'Please ensure questions are filled in' 
+        });
+    }
+    else {
+        convertToJSON();
+        $("#quizDataForm").submit();
+    }
 }
 
+
+function validateQuestions(){
+    for(const question of questions){
+        console.log(question);
+        if(question.questionType==="sa" || question.questionType==="la"){
+            if($.isEmptyObject(question.questionTitle)){
+                return false;
+            }
+        }
+        else if(question.questionType==="cb" || question.questionType==="mc"){
+            if($.isEmptyObject(question.questionTitle)){
+                return false;
+            }
+            else if($.isEmptyObject(question.questionOptions)){
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 
 var tags = {};
 
 function setTags(retrievedTags) {
-    console.log(retrievedTags);
     tags = retrievedTags;
-
 }
 
 
 function moduleChanged() {
     assignedModule = $(`#moduleSelect${selectedCourseID}`).val();
-    console.log(assignedModule);
-    console.log(tags[assignedModule]);
     selectOptions = `
     <option value="" disabled selected>Choose question tag</option>
     `;
@@ -395,5 +458,23 @@ function moduleChanged() {
         });
     }
     $('.questionTag').html(selectOptions);
+    $('select').formSelect();
+}
+
+function moduleChangedQ(qID) {
+    assignedModule = $(`#moduleSelect${selectedCourseID}`).val();
+    selectOptions = `
+    <option value="" disabled selected>Choose question tag</option>
+    `;
+    if (tags[assignedModule] === undefined){
+        selectOptions += `<option value="" selected>this module has no tags</option>`
+    }
+    else {
+        tags[assignedModule].forEach(function (option, index) {
+            selectOptions += `
+                    <option value="${index.toString()}">${option}</option>\n`
+        });
+    }
+    $('#questionTag-'+qID).html(selectOptions);
     $('select').formSelect();
 }

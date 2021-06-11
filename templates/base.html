@@ -43,7 +43,19 @@
       <li><a href="/live/">Live Streaming</a></li>
       <li><a href="/videoLessons/manage/">Video Lessons</a></li>
       <li><a href="/fileUploads/manage/">File Uploads</a></li>
-      <li><a href="/quizzes/manage/">Quizzes</a></li>
+      <li class="no-padding">
+        <ul class="collapsible collapsible-accordion">
+          <li>
+            <a class="collapsible-header" style="padding: 0 32px;">Quiz</a>
+            <div class="collapsible-body">
+              <ul>
+                <li><a href="/quizzes/manage/" style="padding: 0 23.5px 0 50px;">Quizzes</a></li>
+                <li><a href="/quizzes/bank/" style="padding: 0 23.5px 0 50px;">Question Bank</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </li>
       {% endif %}
 
       <!-- if logged in -->
@@ -68,6 +80,17 @@
           padding-left: 0px;
       }
     </style>
+
+
+
+
+
+
+<ul id="dropdown1" class="dropdown-content">  
+  <li><a href="/quizzes/manage/">Quizzes</a></li>
+  <li><a href="/quizzes/bank/">Question Bank</a></li>
+</ul>
+
     <!-- navbar -->
       <nav class="white black-text" style="box-shadow: none;">
           <div class="nav-wrapper black-text">
@@ -79,7 +102,9 @@
               <li><a href="/live/">Live Streaming</a></li>
               <li><a href="/videoLessons/manage/">Video Lessons</a></li>
               <li><a href="/fileUploads/manage/">File Uploads</a></li>
-              <li><a href="/quizzes/manage/">Quizzes</a></li>
+              <li><a class="dropdown-trigger" href="#!" data-target="dropdown1">Quiz<i class="material-icons right">arrow_drop_down</i></a></li>
+
+              
               {% endif %}
         
               <!-- if logged in -->
@@ -154,6 +179,10 @@
       <script type="text/javascript" src="{% static "js/notifications.js" %}"></script>
       <script>
         $('.sidenav').sidenav();
+        $(".dropdown-trigger").dropdown();
+        
+        var collapsibleElem = document.querySelector('.collapsible');
+        var collapsibleInstance = M.Collapsible.init(collapsibleElem, {});
       </script>
       {% block javascript %}
       {% endblock %}

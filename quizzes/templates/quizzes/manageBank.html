@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Question Bank{% endblock %}
+
+
+{% block css %}    
+<style>
+/* list styling */
+ul.collection {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+th, td {
+    text-align: center;
+}
+
+/* Add Button */
+.addQuizBtn {
+  float: right;
+  padding-top: 20px;
+  padding-bottom: 50px;
+}
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<h2 class="center-align">Question Bank</h2>
+
+
+<div id="all" class="col s12">
+    <table style="margin-top: 10px;">
+        <thead>
+          <tr>
+              <th>Question Name</th>
+              <th>Question ID</th>
+              <th>Delete Question</th>
+              <!--
+              <th>Repeat Quiz</th>
+              <th>Download</th>
+              -->
+          </tr>
+        </thead>
+
+        <tbody>
+            {% for i in questionObjects %}
+            <tr>
+                <td style="text-overflow: ellipsis; max-width: 100px; max-height: 1ex; white-space: nowrap; overflow: hidden;">{{ i.questionName }}</td>
+                <td>{{ i.pk }}</td>
+                <td><a href="/quizzes/bank/delete/{{ i.pk }}"><i class="material-icons red-text">delete</i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- add button -->
+<div class="addQuizBtn">
+    <a class="btn-floating btn-large accent-1" href="/quizzes/bank/create">
+        <i class="large material-icons">note_add</i>
+    </a>
+</div>
+
+{% endblock %}
+
+
+
+
+{% block javascript %}
+<script>
+    $('.tooltipped').tooltip();
+</script>
+{% endblock %}

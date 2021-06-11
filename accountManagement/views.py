@@ -144,9 +144,9 @@ def classView(request, classId):
     quizData = []
     for i in quizCounts:
         try:
-            quizData.append((i, str(quizCounts[i]), str(quizCountsPass[i])))
+            quizData.append((i, str(quizCounts[i]), str(quizCountsPass[i], Quiz.objects.filter(quizName = i)[0].quizID)))
         except:
-            quizData.append((i, str(quizCounts[i]), "0"))
+            quizData.append((i, str(quizCounts[i]), "0", Quiz.objects.filter(quizName = i)[0].quizID))
 
     context = {"class": studentClass, "teachers": teachers, "students": students, "courses": courses, "liveLessonsNew": liveLessonsNew, "liveLessonsOld": liveLessonsOld, "quizData": quizData, "nStudents": len(students), }
 
@@ -274,13 +274,14 @@ def individualAccountView(request, userId):
         allQuizResponses = quizResponseJSON.split("__________RESPONSESPLITTER__________")[1:]
 
         quizResults = {}
+        passedResults = {}
         for i in allQuizResponses:
             fullScore = len(re.findall(r'"isCorrect":', i))
             score = len(re.findall(r'"isCorrect": true', i))
 
-            quizResults[json.loads(i)[0]["quizName"]] = "{}/{}".format(score, fullScore)
+            quizResults[json.loads(i)[0]["quizName"]] = ("{}/{}".format(score, fullScore), json.loads(i)[0]["isPassed"])
 
-        context = {"tempUser": user, "classes": classes, "quizResults": quizResults, "timeOnline": timeOnline}
+        context = {"tempUser": user, "classes": classes, "quizResults": quizResults, "timeOnline": timeOnline,}
     else:
         context = {"tempUser": user, "classes": classes, "timeOnline": timeOnline}
 

@@ -3,6 +3,18 @@
 
 {% block title %}Class View{% endblock %}
 
+{% block css %}
+<style>
+.collapsible-body{
+    padding-top: 0px;
+    padding-bottom: 10px;
+}
+.collapsible-header{
+    padding-bottom: 5px;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
 <h3 class="center-align">{{ class }}</h3>
@@ -12,17 +24,21 @@
 <hr>
 
 {% for i in courses %}
-<table class="striped responsive-table">
-    <caption class="left-align">
-        <h5><a href="/course/{{ i.id }}/accounts">{{ i.courseName }}</a></h5>
-    </caption>
-    
-    <colgroup>
-        <col>
-        <col>
-        <col style="width: fit-content">
-    </colgroup>
-
+<h5><a href="/course/{{ i.id }}/accounts">{{ i.courseName }}</a></h5>
+    <ul class="collapsible" style="box-shadow: none; border: none;">
+        <li>
+          <div class="collapsible-header" style="border: none;"><i class="material-icons">add</i>Modules</div>
+          <div class="collapsible-body" style="border: none;">
+            <ul class="collection">
+                {% for j in i.modules %}
+                <li class="collection-item">{{ j.moduleName }}</li>
+                {% endfor %}
+            </ul>
+            
+          </div>
+        </li>
+    </ul>
+    <!--
     <thead>
         <th>Modules</th>
     </thead>
@@ -34,6 +50,7 @@
         </tr>
         {% endfor %}
     </tbody>
+    -->
 </table>
 {% endfor %}
 
@@ -146,6 +163,7 @@
         <th>Quiz Name</th>
         <th>Completed</th>
         <th>Passed</th>
+        <th>Download</th>
     </thead>
 
     <tbody>
@@ -154,10 +172,17 @@
             <td>{{ quizDataRow.0 }}</td>
             <td>{{ quizDataRow.1 }}/{{ nStudents }}</td>
             <td>{{ quizDataRow.2 }}/{{ nStudents }}</td>
+            <td><a href="/quizzes/download/?id={{ quizDataRow.3 }}"><i class="material-icons text-accent-1">download</i></a></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 {% endif %}
 {% endif %}
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $('.collapsible').collapsible();
+</script>
 {% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Download Quiz{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<h2 class="center-align">Download Quiz</h2>
+
+
+<div class="row">
+    <div class="col s12">
+        
+        <div class="input-field col s12">
+            <select id="selectQuiz" onchange="selectChanged()">
+              <option value="" disabled {% if selectedId == "" %}selected{% endif %}>Select Quiz</option>
+              {% for i in quizObjects %}
+              <option value="{{i.quizID}}" {% if i.quizID == selectedId %}selected{% endif %}>{{i.quizName}}</option>
+              {% endfor %}
+            </select>
+            <label>Select Quiz</label>
+          </div>
+
+    </div>
+    
+    <div class="col s12" id="downloadSection" style="display: none;">
+        <h4>Download link</h4>
+        <a id="dlink" href="" style="text-decoration: underline;">hello</a>    
+    </div>
+  </div>
+
+
+
+{% endblock %}
+
+
+
+
+{% block javascript %}
+<script>    
+    $(document).ready(function(){
+        $('select').formSelect();
+        {% if selectedId != "" %}selectChanged();{% endif %}
+    });
+
+    function selectChanged(){
+        var e = document.getElementById("selectQuiz");
+        var quizID = e.value;
+        var linkData = window.location.origin;
+        linkData += "/quizzes/dl/?id=";
+        linkData += quizID;
+        
+        $('#downloadSection').show("slow");
+        $("#dlink").attr("href", linkData)
+        $("#dlink").html(linkData)
+    }
+
+</script>
+{% endblock %}

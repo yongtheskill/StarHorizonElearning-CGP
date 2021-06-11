@@ -24,8 +24,16 @@
             <td>{{ tempUser.email }}</td>
         </tr>
         <tr>
+            <td>Start Date:</td>
+            <td>{{ tempUser.startDate|default_if_none:"-" }}</td>
+        </tr>
+        <tr>
+            <td>Designation:</td>
+            <td>{{ tempUser.designation|default_if_none:"-" }}</td>
+        </tr>
+        <tr>
             <td>Institution:</td>
-            <td>{{ tempUser.institution }}</td>
+            <td>{{ tempUser.institution|default_if_none:"-" }}</td>
         </tr>
         
         {% if user.accountType == "Teacher" %}
@@ -75,16 +83,18 @@
         
         <thead>
             <th>Quiz Name</th>
-            <th>score</th>
+            <th>Score</th>
+            <th>Competency</th>
         </thead>
 
         <tbody>
-            {% for quizName, score in quizResults.items %}
+            {% for quizName, data in quizResults.items %}
             <tr>
                 <td>
                     <a href="/quizzes/viewAns/{{ quizName|b64encode }}/{{ tempUser.id|urlencode:"" }}"> {{ quizName }} </a>
                 </td>
-                <td>{{ score }}</td>
+                <td>{{ data.0 }}</td>
+                <td>{% if data.1 %}Competent 😃{% else %}Not Yet Competent{% endif %}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -4,7 +4,6 @@ from django import forms
 
 from .models import User, Course, StudentClass, Module
 
-
 from django.contrib.auth.models import Group
 
 admin.site.unregister(Group)
@@ -85,11 +84,15 @@ class UserCreationForm(forms.ModelForm):
 
 class UserAdmin(BaseUserAdmin):
     list_filter = ("accountType", )
+    list_display = list(BaseUserAdmin.list_display)
+    list_display.append("designation")
+    
     add_form = UserCreationForm
     
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phoneNumber', 'accountType', 'institution', 'profilePic', )}),
+        ('Administration info', {'fields': ('startDate', 'designation', )}),
         ('Course info', {'fields': ('classes', )}),
         ('Quiz Responses', {'fields': ('quizResponses', )}),
         ('Time Online', {'fields': ('timeOnline', )}),

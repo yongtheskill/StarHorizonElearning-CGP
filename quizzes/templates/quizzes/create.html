@@ -68,7 +68,7 @@
                 {% for i in courseIDs %}
                     <div class="input-field col s12 m6 courseSelectDiv" id="course{{ i }}">
                         <i class="material-icons text-accent-1 prefix">add</i>
-                        <select id="moduleSelect{{ i }}" name="assignedModule" required>
+                        <select id="moduleSelect{{ i }}" name="assignedModule" onchange="moduleChanged()" required>
                             <option value="" disabled selected>Select module for the quiz</option>
                             {% for j in moduleObjects %}
                                 {% if j.course.id == i %}
@@ -104,6 +104,7 @@
                     <li><a onclick="createQuestion('la')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">subject</i>Long Answer</a></li>
                     <li><a onclick="createQuestion('mc')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">radio_button_checked</i>Multiple Choice</a></li>
                     <li><a onclick="createQuestion('cb')" class="btn-floating accent-1-btn btn-override"><i class="material-icons left">check_box</i>Checkboxes</a></li>
+                    <li><a href="#modal1" class="btn-floating accent-1-btn btn-override modal-trigger"><i class="material-icons left">receipt_long</i>Question Bank</a></li>
                 </ul>
             </div>
             <a class="submitButton accent-1-btn waves-effect waves-light btn" style="margin-top: 5px;" onclick="submitForm()"><i class="material-icons right">done</i>create quiz</a>
@@ -111,6 +112,20 @@
     </div>
   </div>
 
+  
+  <div id="modal1" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <h4>Add question from bank</h4>      
+        <div class="collection">
+            {% for question in qbank %}
+            <a href="#" onclick="getBankQuestion({{question.pk}});" class="collection-item">{{question.questionName}}</a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+    </div>
+  </div>
 
 
 {% endblock %}
@@ -123,7 +138,90 @@
 
 <script>
 
+
+function getBankQuestion(questionID){
+    url = "/quizzes/bank/get/"+questionID;
+    $.ajax({url: url, success:setBankQuestion });
+
+    var instance = M.Modal.getInstance($('#modal1'));
+    instance.close();
+}
+
+function setBankQuestion(data){
+
+    addQuestionData(data);
+}
+
+
+function addQuestionData(qData){
+    
+    availableQuestionID += 1;
+    qData["questionID"] = availableQuestionID;
+
+    questions.push(qData);
+
+    $("#allQuesitonsContainer").append(generateQuesionHTML(qData));
+    initialiseChips(qData.questionType, qData.questionID, true, qData);
+    autoGradeInit(qData);
+    M.updateTextFields();
+    updateNumberedList();
+    $("#id_passingScore").attr("max", questions.length);
+    tagSet(qData);
+}
+
+
+
+function tagSet(data){
+    selectedTag = data["questionTag"];
+
+    if (selectedTag === "" || selectedTag == undefined){
+        selectOptions = `
+        <option value="" disabled selected>Choose question tag</option>
+        `;
+    }
+    else{
+        selectOptions = `
+        <option value="" disabled>Choose question tag</option>
+        `;
+    }
+    if(typeof assignedModule !== 'undefined'){
+        if (tags[assignedModule] === undefined){
+            selectOptions += `<option value="" selected>this module has no tags</option>`;
+        }
+        else {
+            tags[assignedModule].forEach(function (option, index) {
+                if(option === selectedTag){
+                    selectOptions += `
+                            <option value="${index.toString()}" selected>${option}</option>\n`;
+                }
+                else{
+                    selectOptions += `
+                            <option value="${index.toString()}">${option}</option>\n`;
+                }
+            });
+        }
+    }
+    $('#questionTag-'+data["questionID"]).html(selectOptions);
+    $('#questionTag-'+data["questionID"]).formSelect();
+}
+
+
+function autoGradeInit(question) {    
+    if (question.isAutoGraded) {
+        $(`div.question-div-identifier-id-${question.questionID.toString()} > div.questionContainer`).append(generateAutoGrade(question));
+    }
+    $('select').formSelect();
+}
+
+
+
+
 $( document ).ready(function() {
+    
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems, {});
+
+
     $('.fixed-action-btn').floatingActionButton({
         direction: 'right',
         hoverEnabled: false
@@ -163,6 +261,7 @@ $( document ).ready(function() {
         // get selected course module
         selectedCourseID = $("#courseSelect").val();
         // set module selections
+        moduleChanged();
         $('.courseSelectDiv').hide();
         $("#course" + selectedCourseID).show(400, "swing");
     }

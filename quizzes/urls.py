@@ -11,4 +11,10 @@ urlpatterns = [
     path('do/<str:quizID>/', views.doQuiz, name='doQuiz'),
     path('repeat/<str:quizID>/', views.repeatQuiz, name='repeatQuiz'),
     path('deleteQuiz/', views.deleteQuiz, name='deleteQuiz'),
+    path('download/', views.downloadQuiz, name='downloadQuiz'),
+    path('dl/', views.exportQuiz, name='downloadQuiz'),
+    path('bank/', views.manageBank, name='quizBank'),
+    path('bank/create/', views.bankCreate, name='createBankQuestion'),
+    path('bank/delete/<int:questionID>', views.bankDelete, name='deleteBankQuestion'),
+    path('bank/get/<int:questionID>', views.bankGet, name='getBankQuestion'),
 ]
