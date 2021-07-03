@@ -91,8 +91,8 @@ class UserAdmin(BaseUserAdmin):
     
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phoneNumber', 'accountType', 'institution', 'profilePic', )}),
-        ('Administration info', {'fields': ('startDate', 'designation', )}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phoneNumber', 'profilePic', )}),
+        ('Administration info', {'fields': ('startDate', 'designation', 'accountType', 'institution', )}),
         ('Course info', {'fields': ('classes', )}),
         ('Quiz Responses', {'fields': ('quizResponses', )}),
         ('Time Online', {'fields': ('timeOnline', )}),

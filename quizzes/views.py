@@ -87,7 +87,21 @@ def downloadQuiz(request):
     except:
         selectedId = ""
 
-    context = {"quizObjects": Quiz.objects.all, "selectedId": selectedId}
+    allQs = list(Quiz.objects.all())
+
+    myClasses = request.user.classes.all()
+    myCourses = set()
+    for i in myClasses:
+        myCourses.update( i.courses.all() )
+        
+    myQs = []
+    
+    for i in allQs:
+        if i.module.course in myCourses:
+            myQs.append(i)
+
+
+    context = {"quizObjects": myQs, "selectedId": selectedId}
 
     return render(request, 'quizzes/download.html', context)
 
@@ -105,7 +119,7 @@ def exportQuiz(request):
 
     qte = json.loads(qte.quizData)
     ws = wb.active
-    
+
     #format header
     baseHeader = ["Class", "Name", "Designation", "Start Date", "QuizName", "Score", "Competency"]
     quizLen = len(qte)
@@ -183,9 +197,6 @@ def exportQuiz(request):
 
                     ws.append(newLine)
                             
-
-
-
 
     wb.save(response)
     return response
@@ -299,7 +310,6 @@ def createQuiz(request):
             return render(request, 'quizzes/manage.html', context)
 
 
-
         questionsJSON = request.POST['allQuestionsJSON']
         questionsJSON = re.sub("_____var__", "", questionsJSON) #remove js stuff
         
@@ -334,6 +344,17 @@ def createQuiz(request):
             newQuiz.passingScore = int(request.POST['passingScore'])
         else:
             newQuiz.passingScore = 0
+
+        if 'ranQn' in request.POST:
+            newQuiz.randomQuestions = 1
+        else:
+            newQuiz.randomQuestions = 0
+
+        if 'ranOp' in request.POST:
+            newQuiz.randomOptions = 1
+        else:
+            newQuiz.randomOptions = 0
+
         newQuiz.quizDueDate = sgt.localize(dueDateTime)
         newQuiz.module = assignedModule
         newQuiz.quizData = questionsJSON
@@ -352,8 +373,9 @@ def createQuiz(request):
 #quiz view page
 @login_required
 def viewQuiz(request, quizID):
+    quizObj = Quiz.objects.get(quizID=quizID)
 
-    context = {"quizObject": Quiz.objects.get(quizID=quizID), }
+    context = {"quizObject": quizObj, "rop": quizObj.randomOptions == 1, "rqn": quizObj.randomQuestions == 1}
 
     return render(request, 'quizzes/view.html', context)
 
@@ -407,10 +429,15 @@ def doQuiz(request, quizID):
 
         return redirect("./")
 
+
+
+
+
+
     quizObj = Quiz.objects.get(quizID=quizID)
 
     #if quizObj.quizDueDate > sgt.localize(datetime.now()):
-    context = {"quizObject": Quiz.objects.get(quizID=quizID), }
+    context = {"quizObject": Quiz.objects.get(quizID=quizID), "rop": quizObj.randomOptions == 1, "rqn": quizObj.randomQuestions == 1}
 
     user = request.user
     quizResponseJSON = user.quizResponses
@@ -425,8 +452,6 @@ def doQuiz(request, quizID):
                     for i in questions:
                         if i["questionID"] == questionID:
                             return i
-
-
 
 
                 quizObjToCombine = json.loads(Quiz.objects.get(quizID=quizID).quizData)
@@ -475,8 +500,6 @@ def viewQuizAns(request, quizNameEncoded, userId):
                     for i in questions:
                         if i["questionID"] == questionID:
                             return i
-
-
 
 
                 quizObjToCombine = json.loads(quizObj.quizData)
@@ -528,6 +551,17 @@ def editQuiz(request, quizID):
         else:
             newQuiz.passingScore = 0
         newQuiz.quizName = request.POST['quizName']
+
+        if 'ranQn' in request.POST:
+            newQuiz.randomQuestions = 1
+        else:
+            newQuiz.randomQuestions = 0
+
+        if 'ranOp' in request.POST:
+            newQuiz.randomOptions = 1
+        else:
+            newQuiz.randomOptions = 0
+
         newQuiz.quizDueDate = sgt.localize(dueDateTime)
         newQuiz.quizData = questionsJSON
         newQuiz.save()

@@ -77,7 +77,15 @@ class QuestionResponse {
 
 var questionResponses = []
 
+var rqn = false;
+var rop = false;
 
+function rq(){
+    rqn = true;
+}
+function ro(){
+    rop = true;
+}
 
 function saAnsChanged(qID) {
     let question = questionResponses.find((o, i) => {
@@ -170,13 +178,14 @@ function renderQuizQuestions(quizJSON) {
             <div class="row answerInputContainer">
                 <div class="input-field col s12 m6">
                     <select id="answerField${question.questionID}" class="fillValidation"  onchange="saAnsChanged(${question.questionID})">
-                        <option value="" disabled selected>Select correct option</option>
+                        <option value="" disabled selected>Select correct option</option><div style="display:inline-block" class="shuffle">
                         `
             question.questionOptions.forEach(function (option, index) {
                 generatedHTML += `
                         <option value="${option}">${option}</option>\n`
             });
             generatedHTML += `
+                    </div>
                     </select>
                     <label>Correct Option</label>
                 </div>
@@ -189,7 +198,7 @@ function renderQuizQuestions(quizJSON) {
             <div class="row answerInputContainer">
                 <div style="margin-top: 10px; margin-bottom: 0px;" class="input-field col s12 m6">
                     <p style="margin-top: 0px;">Select Correct Options</p>
-                    <input hidden class="fillValidation" id="checkbox-question${question.questionID}">`;
+                    <input hidden class="fillValidation" id="checkbox-question${question.questionID}"><div style="display:inline-block" class="shuffle">`;
             question.questionOptions.forEach(function (option, index) {
                 generatedHTML += `
                     <p>
@@ -200,6 +209,7 @@ function renderQuizQuestions(quizJSON) {
                     </p>`;
             });
             generatedHTML += `
+                </div>
                 </div>
             </div>`;
         }

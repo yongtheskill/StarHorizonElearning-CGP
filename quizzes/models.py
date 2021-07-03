@@ -23,6 +23,9 @@ class Quiz(models.Model):
 
     repeatNumber = models.IntegerField(verbose_name="repeat number")
 
+    randomOptions = models.IntegerField(verbose_name="randomise options")
+    randomQuestions = models.IntegerField(verbose_name="randomise questions")
+
     class Meta:
         verbose_name_plural = "Quizzes"
 

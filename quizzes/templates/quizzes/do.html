@@ -37,9 +37,26 @@
 <script type="text/javascript" src="{% static "js/quizzes_do.js" %}"></script>
 
 <script>
+$.fn.shuffleChildren = function() {
+    $.each(this.get(), function(index, el) {
+        var $el = $(el);
+        var $find = $el.children();
+
+        $find.sort(function() {
+            return 0.5 - Math.random();
+        });
+
+        $el.empty();
+        $find.appendTo($el);
+    });
+};
+
+
 $( document ).ready(function() {
+    {% if rqn %}rq();{% endif %}
     setQuizName("{{ quizObject.quizName }}");
     $('div#allQuesitonsContainer').html(renderQuizQuestions('{{ quizObject.quizData |safe }}'));
+    {% if rop %}$(".shuffle").shuffleChildren();{% endif %}
     $('select').formSelect();
 });
 

@@ -50,6 +50,29 @@
                     <label class="black-text" for="id_passingScore">Passing Score</label>
                 </div>
             </div>
+            
+            
+            
+            <div class="row" style="padding-left: 10px;">
+                <div class="input-field col s12 m4">
+                    <div class="switch" id="ranQn">
+                      <label style="font-size: 1rem;">
+                        Randomise Questions
+                        <input type="checkbox" {% if rop %}checked{% endif %}>
+                        <span class="lever"></span>
+                      </label>
+                    </div>
+                </div>
+                <div class="input-field col s12 m4">
+                    <div class="switch" id="ranOp">
+                      <label style="font-size: 1rem;">
+                        Randomise Options
+                        <input type="checkbox" {% if rqn %}checked{% endif %}>
+                        <span class="lever"></span>
+                      </label>
+                    </div>
+                </div>  
+            </div>
 
 
 

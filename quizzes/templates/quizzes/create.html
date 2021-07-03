@@ -53,7 +53,7 @@
             </div>
 
 
-            <div class="row">
+            <div class="row" style="margin-bottom: 0;">
                 <!--select course-->
                 <div class="input-field col s12 m6">
                     <i class="material-icons text-accent-1 prefix">add</i>
@@ -79,6 +79,29 @@
                         <label>Assign quiz to module</label>
                     </div>  
                 {% endfor %}
+            </div>
+            
+            
+            <div class="row" style="padding-left: 10px;">
+                <div class="input-field col s12 m4">
+                    <div class="switch" id="ranQn">
+                      <label style="font-size: 1rem;">
+                        Randomise Questions
+                        <input type="checkbox">
+                        <span class="lever"></span>
+                      </label>
+                    </div>
+                </div>
+                <div class="input-field col s12 m4">
+                    <div class="switch" id="ranOp">
+                      <label style="font-size: 1rem;">
+                        Randomise Options
+                        <input type="checkbox">
+                        <span class="lever"></span>
+                      </label>
+                    </div>
+                </div>  
+
             </div>
 
 
@@ -148,7 +171,6 @@ function getBankQuestion(questionID){
 }
 
 function setBankQuestion(data){
-
     addQuestionData(data);
 }
 
