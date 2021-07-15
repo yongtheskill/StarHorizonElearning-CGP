@@ -211,7 +211,8 @@ function renderQuizQuestions(quizJSON) {
                     }                    
                     isFirst = false;
                   }
-                generatedHTML += `<p>Correct answer:${correctOptions}</p>`
+                
+                generatedHTML += `<p>Correct answer:${correctOptions.substring(1)}</p>`
             }
         }
 
