@@ -334,7 +334,9 @@ function createQuestion (qType) {
     questions.push(newQuestion);
     $("#allQuesitonsContainer").append(generateQuesionHTML(newQuestion));
     updateNumberedList();
+    moduleChangedQ(availableQuestionID);
     initialiseChips(qType, availableQuestionID, false, newQuestion);
+    $('select').formSelect();
     $("#id_passingScore").attr("max", questions.length);
 }
 
@@ -646,7 +648,7 @@ function convertToJSON() {
 
 function submitForm() {
     questionsValid = validateQuestions()
-    if(questions.length < 0){
+    if(questions.length <= 0){
         const errorNotification = window.createNotification({
             theme: 'warning',
         });
@@ -719,5 +721,26 @@ function validateQuestions(){
         $("#course" + selectedCourseID).show(400, "swing");
     }
 
+
+
+    
+
+function moduleChangedQ(qID) {
+    assignedModule = {{ module.pk }};
+    selectOptions = `
+    <option value="" disabled selected>Choose question tag</option>
+    `;
+    if (tags[assignedModule] === undefined){
+        selectOptions += `<option value="" selected>this module has no tags</option>`
+    }
+    else {
+        tags[assignedModule].forEach(function (option, index) {
+            selectOptions += `
+                    <option value="${index.toString()}">${option}</option>\n`
+        });
+    }
+    $('#questionTag-'+qID).html(selectOptions);
+    $('select').formSelect();
+}
 </script>
 {% endblock %}

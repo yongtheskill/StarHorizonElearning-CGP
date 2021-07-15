@@ -390,7 +390,7 @@ function convertToJSON() {
 
 function submitForm() {
     questionsValid = validateQuestions()
-    if(questions.length < 0){
+    if(questions.length <= 0){
         const errorNotification = window.createNotification({
             theme: 'warning',
         });

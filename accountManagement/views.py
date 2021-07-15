@@ -144,7 +144,7 @@ def classView(request, classId):
     quizData = []
     for i in quizCounts:
         try:
-            quizData.append((i, str(quizCounts[i]), str(quizCountsPass[i], Quiz.objects.filter(quizName = i)[0].quizID)))
+            quizData.append((i, str(quizCounts[i]), str(quizCountsPass[i]), Quiz.objects.filter(quizName = i)[0].quizID))
         except:
             quizData.append((i, str(quizCounts[i]), "0", Quiz.objects.filter(quizName = i)[0].quizID))
 

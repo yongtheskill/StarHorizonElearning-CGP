@@ -25,9 +25,9 @@
 
 {% for i in courses %}
 <h5><a href="/course/{{ i.id }}/accounts">{{ i.courseName }}</a></h5>
-    <ul class="collapsible" style="box-shadow: none; border: none;">
+    <ul class="collapsible" style="box-shadow: none; border: none;" onclick="togglePMIcon(this)">
         <li>
-          <div class="collapsible-header" style="border: none;"><i class="material-icons">add</i>Modules</div>
+          <div class="collapsible-header" style="border: none;"><i class="material-icons pmIcon">add</i>Modules</div>
           <div class="collapsible-body" style="border: none;">
             <ul class="collection">
                 {% for j in i.modules %}
@@ -158,9 +158,9 @@
 <h4>All Quizzes</h4>
 <hr>
 
-<table class="striped responsive-table">
+<table class="striped responsive-table centered">
     <thead>
-        <th>Quiz Name</th>
+        <th style="text-align: left;">Quiz Name</th>
         <th>Completed</th>
         <th>Passed</th>
         <th>Download</th>
@@ -169,7 +169,7 @@
     <tbody>
         {% for quizDataRow in quizData %}
         <tr>
-            <td>{{ quizDataRow.0 }}</td>
+            <td style="text-align: left;">{{ quizDataRow.0 }}</td>
             <td>{{ quizDataRow.1 }}/{{ nStudents }}</td>
             <td>{{ quizDataRow.2 }}/{{ nStudents }}</td>
             <td><a href="/quizzes/download/?id={{ quizDataRow.3 }}"><i class="material-icons text-accent-1">download</i></a></td>
@@ -184,5 +184,13 @@
 {% block javascript %}
 <script>
     $('.collapsible').collapsible();
+    togglePMIcon = (elem) => {
+        if ($(elem).find('.pmIcon').html() == "add"){
+            setTimeout(() => $(elem).find('.pmIcon').html("remove"), 100);
+        }
+        else if ($(elem).find('.pmIcon').html() == "remove"){
+            $(elem).find('.pmIcon').html("add");
+        }
+    }
 </script>
 {% endblock %}

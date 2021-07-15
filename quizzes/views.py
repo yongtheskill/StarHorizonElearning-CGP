@@ -49,8 +49,7 @@ def bankCreate(request):
         qJSON = request.POST['allQuestionsJSON']
         qJSON = re.sub("_____var__", "", qJSON) #remove js stuff
         qData = json.loads(qJSON)[0]
-        print(qData)
-        questionName = qData['questionTitle']
+        questionName = request.POST['questionName']
 
         if Question.objects.filter(questionName=questionName):
             context = {"questionObjects": Question.objects.all, "error": "This question name is already being used, please choose a new question name."}
@@ -121,7 +120,7 @@ def exportQuiz(request):
     ws = wb.active
 
     #format header
-    baseHeader = ["Class", "Name", "Designation", "Start Date", "QuizName", "Score", "Competency"]
+    baseHeader = ["Class", "Name", "Designation", "Start Date", "QuizName", "Score", "Passing Score", "Competency"]
     quizLen = len(qte)
     qLi = []
     qtLi = []
@@ -179,7 +178,14 @@ def exportQuiz(request):
                         newLine.append("")
 
                     score = len(re.findall(r'"isCorrect": true', i))
-                    newLine.append(str(score))
+                    try:
+                        newLine.append(str(score))
+                    except:
+                        newLine.append("")
+                    try:
+                        newLine.append(str(passingScore))
+                    except:
+                        newLine.append("")
                     if(score >= passingScore):
                         newLine.append("Competent")
                     else:

@@ -17,13 +17,16 @@
 <h2 class="center-align">Create Question</h2>
 
 
-<form id="quizDataForm" method="post">{% csrf_token %}
-    <input hidden name="allQuestionsJSON" id="allQuestionsJSON"></input>
-</form>
-
 <div class="row">
     <div class="col s12">
         <div class="row">  
+            <form id="quizDataForm" method="post">{% csrf_token %}
+                <input hidden name="allQuestionsJSON" id="allQuestionsJSON"></input>
+                <div class="input-field col s12 m6">
+                    <input id="qname" name="questionName" type="text" autofocus>
+                    <label for="qname">Question Name</label>
+                </div>
+            </form>
             <div class="input-field col s12 m6">
                 <select onchange="questionTypeChanged()" id="questionTypeSelector">
                     <option value="" disabled selected>Select question type</option>
@@ -33,7 +36,7 @@
                     <option value="la">Long Answer</option>
                 </select>
                 <label>Question type</label>
-          </div>
+            </div>
         </div>    
 
         
@@ -511,13 +514,14 @@ function convertToJSON() {
 
 function submitForm() {
     questionsValid = validateQuestions()
-    if(questions.length < 0){
+
+    if(questions.length <= 0){
         const errorNotification = window.createNotification({
             theme: 'warning',
         });
         // Invoke success notification
         errorNotification({ 
-            message: 'Please add at least one question' 
+            message: 'Please select question type' 
         });
     }
     else if (!questionsValid){
@@ -527,6 +531,15 @@ function submitForm() {
         // Invoke success notification
         errorNotification({ 
             message: 'Please ensure questions are filled in' 
+        });
+    }
+    else if (!$('#qname').val()) {
+        const errorNotification = window.createNotification({
+            theme: 'warning',
+        });
+        // Invoke success notification
+        errorNotification({ 
+            message: 'Please enter a question name' 
         });
     }
     else {

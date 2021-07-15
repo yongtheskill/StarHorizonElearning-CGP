@@ -1,10 +1,33 @@
+function shuffle(sourceArray) {
+    for (var i = 0; i < sourceArray.length - 1; i++) {
+        var j = i + Math.floor(Math.random() * (sourceArray.length - i));
+
+        var temp = sourceArray[j];
+        sourceArray[j] = sourceArray[i];
+        sourceArray[i] = temp;
+    }
+    return sourceArray;
+}
+
+
+var rqn = false;
+var rop = false;
+
+function rq(){
+    rqn = true;
+}
+function ro(){
+    rop = true;
+}
 
 function renderQuizQuestions(quizJSON) {
     
     var questionsData = JSON.parse(quizJSON);
 
     var finalHTML = "";
+    
     for (k=0; k < questionsData.length; k++) {
+
         finalHTML += generateQuesionHTML(questionsData[k], k);
     }
 
@@ -26,13 +49,13 @@ function renderQuizQuestions(quizJSON) {
             <div class="row answerInputContainer">
                 <div class="input-field col s12 m6">
                     <select id="mcAnswer${question.questionID}">
-                        <option value="" disabled selected>Select correct option</option>
+                        <option value="" disabled selected>Select correct option</option><div style="display:inline-block" class="shuffle">
                         `
             question.questionOptions.forEach(function (option, index) {
                 generatedHTML += `
                         <option value="${index.toString()}">${option}</option>\n`
             });
-            generatedHTML += `
+            generatedHTML += `</div>
                     </select>
                     <label>Correct Option</label>
                 </div>
@@ -44,7 +67,9 @@ function renderQuizQuestions(quizJSON) {
             generatedHTML += `
             <div class="row answerInputContainer">
                 <div style="margin-top: 10px; margin-bottom: 0px;" class="input-field col s12 m6">
-                    <p style="margin-top: 0px;">Select Correct Options</p>`;
+                    <p style="margin-top: 0px;">Select Correct Options</p><div style="display:inline-block" class="shuffle">`;
+            
+
             question.questionOptions.forEach(function (option, index) {
                 generatedHTML += `
                     <p>
@@ -54,7 +79,13 @@ function renderQuizQuestions(quizJSON) {
                         </label>
                     </p>`;
             });
-            generatedHTML += `
+
+
+
+
+
+
+            generatedHTML += `</div>
                 </div>
             </div>`;
         }

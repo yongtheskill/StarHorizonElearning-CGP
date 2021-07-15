@@ -85,7 +85,7 @@ class UserCreationForm(forms.ModelForm):
 class UserAdmin(BaseUserAdmin):
     list_filter = ("accountType", )
     list_display = list(BaseUserAdmin.list_display)
-    list_display.append("designation")
+    list_display.insert(-1, "designation")
     
     add_form = UserCreationForm
     

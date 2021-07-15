@@ -36,6 +36,11 @@ class Quiz(models.Model):
     def __str__(self):
          return self.quizName
 
+
+
+
+
+
 class Question(models.Model):
     questionId = models.BigAutoField(primary_key=True)
     questionName = models.CharField(max_length=200, verbose_name="question name")
