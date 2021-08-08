@@ -44,6 +44,7 @@ class Quiz(models.Model):
 class Question(models.Model):
     questionId = models.BigAutoField(primary_key=True)
     questionName = models.CharField(max_length=200, verbose_name="question name")
+    questionTitle = models.CharField(max_length=2000, verbose_name="question title")
     creationDate = models.DateTimeField(auto_now_add=True)
 
     questionData = models.CharField(max_length=10000000, verbose_name="question data")

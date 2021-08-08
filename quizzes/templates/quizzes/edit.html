@@ -58,7 +58,7 @@
                     <div class="switch" id="ranQn">
                       <label style="font-size: 1rem;">
                         Randomise Questions
-                        <input type="checkbox" {% if rop %}checked{% endif %}>
+                        <input type="checkbox" name="ranQn" {% if rqn %}checked{% endif %}>
                         <span class="lever"></span>
                       </label>
                     </div>
@@ -67,7 +67,7 @@
                     <div class="switch" id="ranOp">
                       <label style="font-size: 1rem;">
                         Randomise Options
-                        <input type="checkbox" {% if rqn %}checked{% endif %}>
+                        <input type="checkbox" name="ranOp" {% if rop %}checked{% endif %}>
                         <span class="lever"></span>
                       </label>
                     </div>

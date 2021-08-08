@@ -87,7 +87,7 @@
                     <div class="switch" id="ranQn">
                       <label style="font-size: 1rem;">
                         Randomise Questions
-                        <input type="checkbox">
+                        <input type="checkbox" name="ranQn">
                         <span class="lever"></span>
                       </label>
                     </div>
@@ -96,7 +96,7 @@
                     <div class="switch" id="ranOp">
                       <label style="font-size: 1rem;">
                         Randomise Options
-                        <input type="checkbox">
+                        <input type="checkbox" name="ranOp">
                         <span class="lever"></span>
                       </label>
                     </div>
@@ -141,7 +141,7 @@
         <h4>Add question from bank</h4>      
         <div class="collection">
             {% for question in qbank %}
-            <a href="#" onclick="getBankQuestion({{question.pk}});" class="collection-item">{{question.questionName}}</a>
+            <a href="#" onclick="getBankQuestion({{question.pk}});" class="collection-item tooltipped" data-position="top" data-tooltip="{{question.questionTitle}}">{{question.questionName}}</a>
             {% endfor %}
         </div>
     </div>
@@ -271,6 +271,7 @@ $( document ).ready(function() {
     $( document ).ready(function() {
         $('select').formSelect();
         $('.courseSelectDiv').hide();
+    $('.tooltipped').tooltip();
     });
 
     var modules = {

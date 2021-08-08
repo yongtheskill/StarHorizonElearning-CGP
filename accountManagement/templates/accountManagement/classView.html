@@ -12,6 +12,33 @@
 .collapsible-header{
     padding-bottom: 5px;
 }
+.collapsible-header:hover{
+    background-color: #eee;
+}
+
+.coll {
+  background-color: #fff;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.coll:hover {
+  background-color: #eee;
+}
+
+
+.content {
+  padding: 0 18px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
 </style>
 {% endblock %}
 
@@ -38,19 +65,6 @@
           </div>
         </li>
     </ul>
-    <!--
-    <thead>
-        <th>Modules</th>
-    </thead>
-
-    <tbody>
-        {% for j in i.modules %}
-        <tr>
-            <td>{{ j.moduleName }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-    -->
 </table>
 {% endfor %}
 
@@ -67,8 +81,10 @@
 <br><br>
 <h4>People</h4>
 <hr>
+<h5>Trainers</h5>
+<div type="button" class="coll" onclick="togglePMIcon(this)"><i class="material-icons pmIcon" style="vertical-align: bottom; padding-right: 15px;">add</i>View</div>
+<div class="content">
 <table class="striped responsive-table">
-    <caption class="left-align"><h5>Trainers</h5></caption>    
     <thead>
         <th>Name</th>
         <th>Email</th>
@@ -85,11 +101,13 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 
 <br><br>
-
-<table class="striped responsive-table">
-    <caption class="left-align"><h5>Users</h5></caption>    
+<h5>Users</h5>
+<div type="button" class="coll" onclick="togglePMIcon(this)"><i class="material-icons pmIcon" style="vertical-align: bottom; padding-right: 15px;">add</i>View</div>
+<div class="content">
+<table class="striped responsive-table">   
     <thead>
         <tr>
             <th>Name</th>
@@ -118,6 +136,8 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
+
 
 {% if liveLessonsNew or liveLessonsOld %}
 <br><br>
@@ -193,4 +213,21 @@
         }
     }
 </script>
+
+<script>
+    var coll = document.getElementsByClassName("coll");
+    var i;
+    
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.maxHeight){
+          content.style.maxHeight = null;
+        } else {
+          content.style.maxHeight = content.scrollHeight + "px";
+        }
+      });
+    }
+    </script>
 {% endblock %}

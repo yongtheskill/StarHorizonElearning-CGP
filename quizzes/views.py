@@ -57,6 +57,7 @@ def bankCreate(request):
 
 
         newQuestion = Question()
+        newQuestion.questionTitle = qData["questionTitle"]
         newQuestion.questionName = questionName
         newQuestion.questionData = json.dumps(qData)
         newQuestion.save()
@@ -557,7 +558,7 @@ def editQuiz(request, quizID):
         else:
             newQuiz.passingScore = 0
         newQuiz.quizName = request.POST['quizName']
-
+        
         if 'ranQn' in request.POST:
             newQuiz.randomQuestions = 1
         else:
@@ -591,7 +592,7 @@ def editQuiz(request, quizID):
         courseObjects = list(Course.objects.all())
         courseIDs = [i.id for i in courseObjects]
 
-        context = {"qbank": Question.objects.all, "courseObjects": courseObjects, "courseIDs": courseIDs ,"modObjects": Module.objects.all, "quizObject": quizObj, "dueDate": dueDate, "dueTime": dueTime, "passingScore": passingScore, "availableTags": availableTags, "module": module}
+        context = {"rqn": quizObj.randomQuestions == 1, "rop": quizObj.randomOptions == 1, "qbank": Question.objects.all, "courseObjects": courseObjects, "courseIDs": courseIDs ,"modObjects": Module.objects.all, "quizObject": quizObj, "dueDate": dueDate, "dueTime": dueTime, "passingScore": passingScore, "availableTags": availableTags, "module": module}
         return render(request, 'quizzes/edit.html', context)
     
 
