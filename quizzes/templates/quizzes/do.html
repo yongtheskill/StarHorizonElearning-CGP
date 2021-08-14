@@ -37,6 +37,7 @@
 <script type="text/javascript" src="{% static "js/quizzes_do.js" %}"></script>
 
 <script>
+
 $.fn.shuffleChildren = function() {
     $.each(this.get(), function(index, el) {
         var $el = $(el);
@@ -53,9 +54,16 @@ $.fn.shuffleChildren = function() {
 
 
 $( document ).ready(function() {
-    {% if rqn %}rq();{% endif %}
     setQuizName("{{ quizObject.quizName }}");
     $('div#allQuesitonsContainer').html(renderQuizQuestions('{{ quizObject.quizData |safe }}'));
+    {% if rqn %}
+    console.log("aaa");
+    $("#allQuesitonsContainer").shuffleChildren();
+    var numLabels = document.getElementsByClassName("qNumLabel");
+    for(let i=0; i<numLabels.length; i++){
+        numLabels[i].innerHTML = i+1
+    }
+    {% endif %}
     {% if rop %}$(".shuffle").shuffleChildren();{% endif %}
     $('select').formSelect();
 });

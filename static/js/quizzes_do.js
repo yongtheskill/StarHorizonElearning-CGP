@@ -82,6 +82,7 @@ var rop = false;
 
 function rq(){
     rqn = true;
+
 }
 function ro(){
     rop = true;
@@ -142,7 +143,7 @@ function setQuizName(quizName){
 function renderQuizQuestions(quizJSON) {
     
     var questionsData = JSON.parse(quizJSON);
-
+    
     var finalHTML = "";
     for (k=0; k < questionsData.length; k++) {
         finalHTML += generateQuesionHTML(questionsData[k], k);
@@ -169,7 +170,7 @@ function renderQuizQuestions(quizJSON) {
             <div class="questionContainer">
                 <div class="row  noPadding valign-wrapper">
                     <div class="input-field col s12 quesionInput">
-                        <h6 style="margin: 0px;" id="questionNumberLabel${question.questionID}">${index + 1}. ${question.questionTitle}</h4>
+                        <h6 style="margin: 0px;" id="questionNumberLabel${question.questionID}"><span class="qNumLabel">${index + 1}</span>. ${question.questionTitle}</h4>
                     </div>
                 </div>`;
 
@@ -228,7 +229,7 @@ function renderQuizQuestions(quizJSON) {
             generatedHTML += `
             <div class="row answerInputContainer">
                 <div class="input-field col s12">
-                    <textarea  id="answerField${question.questionID}" class="fillValidation"  type="text" class="materialize-textarea" onfocusout="saAnsChanged(${question.questionID})"></textarea>
+                    <textarea  id="answerField${question.questionID}" class="fillValidation materialize-textarea"  type="text" onfocusout="saAnsChanged(${question.questionID})"></textarea>
                     <label for="answerField${question.questionID}">Your answer</label>
                 </div>
             </div>`;

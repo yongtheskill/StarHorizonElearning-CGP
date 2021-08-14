@@ -183,7 +183,7 @@ function addQuestionData(qData){
     questions.push(qData);
 
     $("#allQuesitonsContainer").append(generateQuesionHTML(qData));
-    initialiseChips(qData.questionType, qData.questionID, true, qData);
+    initialiseNewChips(qData.questionType, qData.questionID, true, qData);
     autoGradeInit(qData);
     M.updateTextFields();
     updateNumberedList();
@@ -191,6 +191,32 @@ function addQuestionData(qData){
     tagSet(qData);
 }
 
+
+function initialiseNewChips (qType, qID, isExistingQn, question){
+    if (qType === "mc" || qType === "cb"){
+        if (isExistingQn === false) {
+            $(`.chips-placeholder.chips-identifier-${qID}`).chips({
+                placeholder: 'Add options',
+                secondaryPlaceholder: '+Option',
+                onChipAdd: function(){chipsEdited(qID);},
+                onChipDelete: function(){chipsEdited(qID);},
+            });
+        } else {
+            formattedData = []
+            for (i=0; i < question.questionOptions.length; i++){
+                formattedData.push({tag: question.questionOptions[i]});
+            }
+            formattedData = 
+            $(`.chips-placeholder.chips-identifier-${qID}`).chips({
+                placeholder: 'Add options',
+                secondaryPlaceholder: '+Option',
+                onChipAdd: function(){chipsEdited(qID);},
+                onChipDelete: function(){chipsEdited(qID);},
+                data: formattedData,
+            });
+        }
+    }
+}
 
 
 function tagSet(data){
