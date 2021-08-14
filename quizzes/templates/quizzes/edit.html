@@ -121,7 +121,7 @@
       <h4>Add question from bank</h4>      
       <div class="collection">
           {% for question in qbank %}
-          <a href="#" onclick="getBankQuestion({{question.pk}});" class="collection-item">{{question.questionName}}</a>
+          <a href="#" onclick="getBankQuestion({{question.pk}});" class="collection-item tooltipped" data-position="top" data-tooltip="{{question.questionTitle}}">{{question.questionName}}</a>
           {% endfor %}
       </div>
   </div>
@@ -176,6 +176,8 @@ $( document ).ready(function() {
         hoverEnabled: false
     });
     $('select').formSelect();
+    $('.tooltipped').tooltip();
+    console.log("tt");
 });
 
 var tags = { "{{ module.pk }}": [{{ availableTags|safe }}, ] };
@@ -280,7 +282,6 @@ class Question {
 
 
 function tagSet(data){
-    console.log(data);
 
     selectedTag = data["questionTag"];
 
@@ -675,7 +676,6 @@ function submitForm() {
 
 function validateQuestions(){
     for(const question of questions){
-        console.log(question);
         if(question.questionType==="sa" || question.questionType==="la"){
             if($.isEmptyObject(question.questionTitle)){
                 return false;

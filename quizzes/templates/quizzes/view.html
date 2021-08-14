@@ -38,25 +38,51 @@
 <script type="text/javascript" src="{% static "js/quizzes_view.js" %}"></script>
 
 <script>
-$.fn.shuffleChildren = function() {
-    $.each(this.get(), function(index, el) {
-        var $el = $(el);
-        var $find = $el.children();
-
-        $find.sort(function() {
-            return 0.5 - Math.random();
+    function shuffleO(array) {
+      var currentIndex = array.length,  randomIndex;
+    
+      // While there remain elements to shuffle...
+      while (0 !== currentIndex) {
+    
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+    
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+          array[randomIndex], array[currentIndex]];
+      }
+    
+      return array;
+    }
+    
+    $.fn.shuffleChildren = function() {
+        $.each(this.get(), function(index, el) {
+            var $el = $(el);
+            var $title = $el.children().filter("[disabled]");
+            var $find = $el.children().filter(":not([disabled])");
+    
+            $find = shuffleO($find)
+    
+            $el.empty();
+            $title.appendTo($el);
+            $find.appendTo($el);
+            console.log($el)
         });
-
-        $el.empty();
-        $find.appendTo($el);
-    });
-};
+    };
 
 
 $( document ).ready(function() {
-    {% if rqn %}rq();{% endif %}
     $('div#allQuesitonsContainer').html(renderQuizQuestions('{{ quizObject.quizData |safe }}'));
-    {% if rop %}$(".shuffle").shuffleChildren();{% endif %}
+    {% if rqn %}
+    $("#allQuesitonsContainer").shuffleChildren();
+    var numLabels = document.getElementsByClassName("qNumLabel");
+    for(let i=0; i<numLabels.length; i++){
+        numLabels[i].innerHTML = i+1
+    }
+    {% endif %}
+    {% if rop %}$(".shuffle").shuffleChildren();
+    {% endif %}
     $('select').formSelect();
 });
 

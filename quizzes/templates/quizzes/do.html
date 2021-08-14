@@ -37,18 +37,36 @@
 <script type="text/javascript" src="{% static "js/quizzes_do.js" %}"></script>
 
 <script>
+function shuffleO(array) {
+  var currentIndex = array.length,  randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
 
 $.fn.shuffleChildren = function() {
     $.each(this.get(), function(index, el) {
         var $el = $(el);
-        var $find = $el.children();
+        var $title = $el.children().filter("[disabled]");
+        var $find = $el.children().filter(":not([disabled])");
 
-        $find.sort(function() {
-            return 0.5 - Math.random();
-        });
+        $find = shuffleO($find)
 
         $el.empty();
+        $title.appendTo($el);
         $find.appendTo($el);
+        console.log($el)
     });
 };
 
@@ -57,14 +75,14 @@ $( document ).ready(function() {
     setQuizName("{{ quizObject.quizName }}");
     $('div#allQuesitonsContainer').html(renderQuizQuestions('{{ quizObject.quizData |safe }}'));
     {% if rqn %}
-    console.log("aaa");
     $("#allQuesitonsContainer").shuffleChildren();
     var numLabels = document.getElementsByClassName("qNumLabel");
     for(let i=0; i<numLabels.length; i++){
         numLabels[i].innerHTML = i+1
     }
     {% endif %}
-    {% if rop %}$(".shuffle").shuffleChildren();{% endif %}
+    {% if rop %}$(".shuffle").shuffleChildren();
+    {% endif %}
     $('select').formSelect();
 });
 
