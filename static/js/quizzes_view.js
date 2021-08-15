@@ -48,15 +48,14 @@ function renderQuizQuestions(quizJSON) {
             generatedHTML += `
             <div class="row answerInputContainer">
                 <div class="input-field col s12 m6">
-                    <select id="mcAnswer${question.questionID}">
+                    <select id="mcAnswer${question.questionID}" class="shuffle">
                         <option value="" disabled selected>Select correct option</option>
-                            <div style="display:inline-block" class="shuffle">
                         `
             question.questionOptions.forEach(function (option, index) {
                 generatedHTML += `
                         <option value="${index.toString()}">${option}</option>\n`
             });
-            generatedHTML += `</div>
+            generatedHTML += `
                     </select>
                     <label>Correct Option</label>
                 </div>
