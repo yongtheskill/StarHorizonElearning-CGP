@@ -40,7 +40,7 @@ function renderQuizQuestions(quizJSON) {
             <div class="questionContainer">
                 <div class="row  noPadding valign-wrapper">
                     <div class="input-field col s12 quesionInput">
-                        <h6 style="margin: 0px;" id="questionNumberLabel${question.questionID}">${index + 1}. ${question.questionTitle}</h4>
+                        <h6 style="margin: 0px;" id="questionNumberLabel${question.questionID}"><span class="qNumLabel">${index + 1}</span>. ${question.questionTitle}</h4>
                     </div>
                 </div>`;
 
@@ -48,14 +48,14 @@ function renderQuizQuestions(quizJSON) {
             generatedHTML += `
             <div class="row answerInputContainer">
                 <div class="input-field col s12 m6">
-                    <select id="mcAnswer${question.questionID}">
-                        <option value="" disabled selected>Select correct option</option><div style="display:inline-block" class="shuffle">
+                    <select id="mcAnswer${question.questionID}" class="shuffle">
+                        <option value="" disabled selected>Select correct option</option>
                         `
             question.questionOptions.forEach(function (option, index) {
                 generatedHTML += `
                         <option value="${index.toString()}">${option}</option>\n`
             });
-            generatedHTML += `</div>
+            generatedHTML += `
                     </select>
                     <label>Correct Option</label>
                 </div>
