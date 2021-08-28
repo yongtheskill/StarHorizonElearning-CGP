@@ -182,7 +182,11 @@ def courseView(request, courseId):
 
         module.quizzesNew, module.quizzesOld = newnessChecker( allQuizzes )
         module.videoLessonsNew, module.videoLessonsOld = newnessChecker( list(Video.objects.filter(module = module)) )
-        module.fileUploadsNew, module.fileUploadsOld = newnessChecker( list(FileUpload.objects.filter(module = module)) )
+
+        fileUploadsNew, fileUploadsOld = newnessChecker( list(FileUpload.objects.filter(module = module)) )
+        module.fileUploadsAll = [{"file": f, "new": True} for f in fileUploadsNew]
+        module.fileUploadsAll.extend([{"file": f, "new": False} for f in fileUploadsOld])
+        module.fileUploadsAll.sort(key=lambda x: x["file"].fileName)
 
 
     context = {"course": course, "ownClasses": ownClasses, "otherClasses": otherClasses, "modules": modules, }
