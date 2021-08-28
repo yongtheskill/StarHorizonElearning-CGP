@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'liveLesson.apps.LivelessonConfig',
 
     'storages',
-    'django_unused_media',
 ]
 
 MIDDLEWARE = [
