@@ -186,7 +186,7 @@ def courseView(request, courseId):
         fileUploadsNew, fileUploadsOld = newnessChecker( list(FileUpload.objects.filter(module = module)) )
         module.fileUploadsAll = [{"file": f, "new": True} for f in fileUploadsNew]
         module.fileUploadsAll.extend([{"file": f, "new": False} for f in fileUploadsOld])
-        module.fileUploadsAll.sort(key=lambda x: x["file"].fileName)
+        module.fileUploadsAll.sort(key=lambda x: x["file"].fileID)
 
 
     context = {"course": course, "ownClasses": ownClasses, "otherClasses": otherClasses, "modules": modules, }
