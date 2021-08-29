@@ -180,8 +180,17 @@ def courseView(request, courseId):
                         pass
 
 
-        module.quizzesNew, module.quizzesOld = newnessChecker( allQuizzes )
-        module.videoLessonsNew, module.videoLessonsOld = newnessChecker( list(Video.objects.filter(module = module)) )
+        quizzesNew, quizzesOld = newnessChecker( allQuizzes )
+        module.quizzesAll = [{"quiz": q, "new": True} for q in quizzesNew]
+        module.quizzesAll.extend([{"quiz": q, "new": False} for q in quizzesOld])
+        module.quizzesAll.sort(key=lambda x: x["quiz"].quizID)
+
+
+        videoLessonsNew, videoLessonsOld = newnessChecker( list(Video.objects.filter(module = module)) )
+        module.videoLessonsAll = [{"vLesson": v, "new": True} for v in videoLessonsNew]
+        module.videoLessonsAll.extend([{"vLesson": v, "new": False} for v in videoLessonsOld])
+        module.videoLessonsAll.sort(key=lambda x: x["vLesson"].videoID)
+
 
         fileUploadsNew, fileUploadsOld = newnessChecker( list(FileUpload.objects.filter(module = module)) )
         module.fileUploadsAll = [{"file": f, "new": True} for f in fileUploadsNew]

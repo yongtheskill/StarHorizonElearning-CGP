@@ -65,56 +65,40 @@
     </colgroup>
 
 
-    {% if i.quizzesNew or i.quizzesOld %}
+    {% if i.quizzesAll %}
     <thead>
         <th>Quizzes</th>
         <th>Due Date</th>
         <th></th>
     </thead>
     <tbody>
-        {% for j in i.quizzesNew %}
+        {% for j in i.quizzesAll %}
         <tr>
             <td>
-                <a href="/quizzes/do/{{ j.quizID }}" class="markVisited">{{ j.quizName }}</a>
+                <a href="/quizzes/do/{{ j.quiz.quizID }}" class="markVisited">{{ j.quiz.quizName }}</a>
             </td>
-            <td>{{ j.quizDueDate }}</td>
-            <td style="color: red">New</td>
-        </tr>
-        {% endfor %}
-        {% for j in i.quizzesOld %}
-        <tr>
-            <td>
-                <a href="/quizzes/do/{{ j.quizID }}" class="markVisited">{{ j.quizName }}</a>
-            </td>
-            <td>{{ j.quizDueDate }}</td>
+            <td>{{ j.quiz.quizDueDate }}</td>
+            <td style="color: red">{% if j.new %}New{% endif %}</td>
         </tr>
         {% endfor %}
     </tbody>
     {% endif %}
 
 
-    {% if i.videoLessonsNew or i.videoLessonsOld %}
+    {% if i.videoLessonsAll %}
     <thead>
         <th>Videos</th>
         <th></th>
     </thead>
     
     <tbody>
-        {% for j in i.videoLessonsNew %}
+        {% for j in i.videoLessonsAll %}
         <tr>
             <td>
-                <a href="/videoLessons/view/{{ j.videoID }}/" class="markVisited">{{ j.videoName }}</a>
+                <a href="/videoLessons/view/{{ j.vLesson.videoID }}/" class="markVisited">{{ j.vLesson.videoName }}</a>
             </td>
             <td></td>
-            <td style="color: red">New</td>
-        </tr>
-        {% endfor %}
-        {% for j in i.videoLessonsOld %}
-        <tr>
-            <td>
-                <a href="/videoLessons/view/{{ j.videoID }}/" class="markVisited">{{ j.videoName }}</a>
-            </td>
-            <td></td>
+            <td style="color: red">{% if j.new %}New{% endif %}</td>
         </tr>
         {% endfor %}
     </tbody>
