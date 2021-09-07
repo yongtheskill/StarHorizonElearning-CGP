@@ -192,14 +192,20 @@ def exportQuiz(request):
                     else:
                         newLine.append("Not Yet Competent")
 
-                    correctData = []
-                    for j in quizData[1:]:
-                        if j["isCorrect"]:
-                            correctData.append("1")
-                        else:
-                            correctData.append("0")
+                    try:
+                        correctData = []
+                        for j in quizData[1:]:
+                            try:
+                                if j["isCorrect"]:
+                                    correctData.append("1")
+                                else:
+                                    correctData.append("0")
+                            except:
+                                correctData.append("-")
+                        newLine += correctData
+                    except:
+                        newLine.append("")
 
-                    newLine += correctData
                     newLine += qTags
 
                     ws.append(newLine)
