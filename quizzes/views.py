@@ -331,7 +331,7 @@ def createQuiz(request):
 
         questionsJSON[0]["quizName"] = request.POST['quizName']
         
-        questionsJSON = json.dumps(questionsJSON)
+        questionsJSON = json.dumps(questionsJSON).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace("\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f")
         
         if not "assignedModule" in request.POST or not (request.POST['dueDate']!='' and request.POST['dueTime']!='' and request.POST["assignedModule"] and request.POST["assignedModule"]!='' and request.POST['quizName']!=''):
             context = {"quizObjects": Quiz.objects.all, "error": "Please fill in all fields."}
