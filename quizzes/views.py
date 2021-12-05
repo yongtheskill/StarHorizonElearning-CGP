@@ -548,6 +548,7 @@ def editQuiz(request, quizID):
     if request.method == 'POST':
         questionsJSON = request.POST['allQuestionsJSON']
         questionsJSON = re.sub("_____var__", "", questionsJSON) #remove js stuff
+        questionsJSON = questionsJSON.replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace("\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f")
         
         dueDate = request.POST['dueDate']
         dueTime = request.POST['dueTime']
