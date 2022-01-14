@@ -1,3 +1,6 @@
+from django.http import HttpResponse, JsonResponse
+from openpyxl import Workbook
+from datetime import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
@@ -11,13 +14,6 @@ import base64
 
 import pytz
 sgt = pytz.timezone('Asia/Singapore')
-from datetime import datetime
-
-from openpyxl import Workbook
-from django.http import HttpResponse, JsonResponse
-
-
-
 
 
 @login_required
@@ -27,59 +23,55 @@ def bankGet(request, questionID):
     return JsonResponse(json.loads(question.questionData))
 
 
-
-
 @login_required
 def bankDelete(request, questionID):
     qtd = Question.objects.filter(pk=questionID)
     try:
         qtd.delete()
     except:
-        context = {"questionObjects": Question.objects.all, "error": "Error deleting question, please do not use the back button or refresh the page"}
-    context = {"questionObjects": Question.objects.all, "notification": "Successfully deleted question"}
+        context = {"questionObjects": Question.objects.all,
+                   "error": "Error deleting question, please do not use the back button or refresh the page"}
+    context = {"questionObjects": Question.objects.all,
+               "notification": "Successfully deleted question"}
 
     return render(request, 'quizzes/manageBank.html', context)
 
-#quiz creation page
+# quiz creation page
+
+
 @login_required
 def bankCreate(request):
-   
-    #if submitting form
+
+    # if submitting form
     if request.method == 'POST':
         qJSON = request.POST['allQuestionsJSON']
-        qJSON = re.sub("_____var__", "", qJSON) #remove js stuff
+        qJSON = re.sub("_____var__", "", qJSON)  # remove js stuff
         qData = json.loads(qJSON)[0]
         questionName = request.POST['questionName']
 
         if Question.objects.filter(questionName=questionName):
-            context = {"questionObjects": Question.objects.all, "error": "This question name is already being used, please choose a new question name."}
+            context = {"questionObjects": Question.objects.all,
+                       "error": "This question name is already being used, please choose a new question name."}
             return render(request, 'quizzes/manageBank.html', context)
-
 
         newQuestion = Question()
         newQuestion.questionTitle = qData["questionTitle"]
         newQuestion.questionName = questionName
-        newQuestion.questionData = json.dumps(qData)
+        newQuestion.questionData = json.dumps(qData).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace(
+            "\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f").replace("'", "\u2019")
         newQuestion.save()
-        
-        context = {"questionObjects": Question.objects.all, "notification": "Successfully created questions"}
+
+        context = {"questionObjects": Question.objects.all,
+                   "notification": "Successfully created questions"}
         return render(request, 'quizzes/manageBank.html', context)
 
-
     else:
-        
+
         context = {}
         return render(request, 'quizzes/bankCreate.html', context)
 
 
-
-
-
-
-
-
-
-#quiz management page
+# quiz management page
 @login_required
 def downloadQuiz(request):
     try:
@@ -92,61 +84,62 @@ def downloadQuiz(request):
     myClasses = request.user.classes.all()
     myCourses = set()
     for i in myClasses:
-        myCourses.update( i.courses.all() )
-        
+        myCourses.update(i.courses.all())
+
     myQs = []
-    
+
     for i in allQs:
         if i.module.course in myCourses:
             myQs.append(i)
-
 
     context = {"quizObjects": myQs, "selectedId": selectedId}
 
     return render(request, 'quizzes/download.html', context)
 
 
-
 @login_required
 def exportQuiz(request):
 
     wb = Workbook()
-    qte = Quiz.objects.get(quizID=request.GET["id"])    
+    qte = Quiz.objects.get(quizID=request.GET["id"])
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="{}.xlsx"'.format(qte.quizID)
+    response['Content-Disposition'] = 'attachment; filename="{}.xlsx"'.format(
+        qte.quizID)
     quizName = qte.quizName
     passingScore = qte.passingScore
 
     qte = json.loads(qte.quizData)
     ws = wb.active
 
-    #format header
-    baseHeader = ["Class", "Name", "Designation", "Start Date", "QuizName", "Score", "Passing Score", "Competency"]
+    # format header
+    baseHeader = ["Class", "Name", "Designation", "Start Date",
+                  "QuizName", "Score", "Passing Score", "Competency"]
     quizLen = len(qte)
     qLi = []
     qtLi = []
     qTags = []
 
     for i in range(quizLen):
-        qLi.append("Q"+ str(i+1))
-        qtLi.append("Q"+ str(i+1) + "Tag")
+        qLi.append("Q" + str(i+1))
+        qtLi.append("Q" + str(i+1) + "Tag")
         try:
             qTags.append(qte[i]["questionTag"])
         except:
             qTags.append("")
-    
+
     baseHeader += qLi
     baseHeader += qtLi
-    
+
     ws.append(baseHeader)
 
     allUsers = list(User.objects.all())
 
-    #for user in allUsers:
+    # for user in allUsers:
     for user in allUsers:
         quizResponseJSON = user.quizResponses
         if quizResponseJSON and "__________RESPONSESPLITTER__________" in quizResponseJSON:
-            allQuizResponses = quizResponseJSON.split("__________RESPONSESPLITTER__________")[1:]
+            allQuizResponses = quizResponseJSON.split(
+                "__________RESPONSESPLITTER__________")[1:]
 
             for i in allQuizResponses:
                 quizData = json.loads(i)
@@ -162,17 +155,17 @@ def exportQuiz(request):
                         newLine.append(user.first_name + " " + user.last_name)
                     except:
                         newLine.append("")
-                    
+
                     try:
                         newLine.append(user.designation)
                     except:
                         newLine.append("")
-                    
+
                     try:
                         newLine.append(str(user.startDate))
                     except:
                         newLine.append("")
-                    
+
                     try:
                         newLine.append(quizName)
                     except:
@@ -209,11 +202,10 @@ def exportQuiz(request):
                     newLine += qTags
 
                     ws.append(newLine)
-                            
 
     wb.save(response)
     return response
-                
+
 
 def tryAppend(l, data):
     try:
@@ -222,7 +214,7 @@ def tryAppend(l, data):
         l.append("")
 
 
-#quiz management page
+# quiz management page
 @login_required
 def manageQuizzes(request):
 
@@ -236,32 +228,29 @@ def manageQuizzes(request):
     return render(request, 'quizzes/manage.html', context)
 
 
-
-#quiz management page
+# quiz management page
 @login_required
 def manageBank(request):
 
-
-    context = {"questionObjects": Question.objects.all,}
+    context = {"questionObjects": Question.objects.all, }
 
     return render(request, 'quizzes/manageBank.html', context)
-    
 
 
-
-#quiz view page
+# quiz view page
 @login_required
 def repeatQuiz(request, quizID):
 
     newQuiz = Quiz.objects.get(quizID=quizID)
-    
+
     newQuiz.pk = None
     if newQuiz.repeatNumber > 3:
         anyDue = False
         for i in Quiz.objects.all():
             if i.isDue:
                 anyDue = True
-        context = {"quizObjects": Quiz.objects.all, "anyDue": anyDue, "error": "You cannot repeat a quiz more than 3 times."}
+        context = {"quizObjects": Quiz.objects.all, "anyDue": anyDue,
+                   "error": "You cannot repeat a quiz more than 3 times."}
         return render(request, 'quizzes/manage.html', context)
     elif newQuiz.repeatNumber > 0:
         newQuiz.repeatNumber += 1
@@ -271,23 +260,23 @@ def repeatQuiz(request, quizID):
         newQuiz.quizName += " repeat 1"
 
     if request.method == 'POST':
-        
+
         dueDate = request.POST['dueDate']
         dueTime = request.POST['dueTime']
 
         dueDate += dueTime
         dueDateTime = datetime.strptime(dueDate, "%b %d, %Y%I:%M %p")
-        
+
         newQuiz.quizDueDate = sgt.localize(dueDateTime)
         newQuiz.quizID += "r"
         newQuiz.save()
-        
 
         anyDue = False
         for i in Quiz.objects.all():
             if i.isDue:
                 anyDue = True
-        context = {"quizObjects": Quiz.objects.all, "anyDue": anyDue, "notification": "Successfully repeated quiz"}
+        context = {"quizObjects": Quiz.objects.all, "anyDue": anyDue,
+                   "notification": "Successfully repeated quiz"}
         return render(request, 'quizzes/manage.html', context)
 
     else:
@@ -295,46 +284,43 @@ def repeatQuiz(request, quizID):
         return render(request, 'quizzes/repeat.html', context)
 
 
-
-
-
-#quiz creation page
+# quiz creation page
 @login_required
 def createQuiz(request):
     nowTime = datetime.now()
     timestamp = nowTime.strftime("%Y-%m-%d-%H-%M")
 
-
     modules = Module.objects.all()
     for module in modules:
         module.tags = list(set(list(module.course.quizTags.split(","))))
 
-
-
     courseObjects = list(Course.objects.all())
     courseIDs = [i.id for i in courseObjects]
 
-    context = {"qbank": Question.objects.all, "quizIDtoUse": "quiz%s" % (timestamp), "courseObjects": courseObjects, "courseIDs": courseIDs ,"moduleObjects": modules, }
-    
-    #if submitting form
+    context = {"qbank": Question.objects.all, "quizIDtoUse": "quiz%s" % (
+        timestamp), "courseObjects": courseObjects, "courseIDs": courseIDs, "moduleObjects": modules, }
+
+    # if submitting form
     if request.method == 'POST':
         if Quiz.objects.filter(quizID=request.POST['quizID']):
-            context = {"quizObjects": Quiz.objects.all, "error": "This quiz ID is already being used, please avoid refreshing the page."}
+            context = {"quizObjects": Quiz.objects.all,
+                       "error": "This quiz ID is already being used, please avoid refreshing the page."}
             return render(request, 'quizzes/manage.html', context)
 
-
         questionsJSON = request.POST['allQuestionsJSON']
-        questionsJSON = re.sub("_____var__", "", questionsJSON) #remove js stuff
-        
+        questionsJSON = re.sub(
+            "_____var__", "", questionsJSON)  # remove js stuff
 
         questionsJSON = json.loads(questionsJSON)
 
         questionsJSON[0]["quizName"] = request.POST['quizName']
-        
-        questionsJSON = json.dumps(questionsJSON).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace("\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f")
-        
-        if not "assignedModule" in request.POST or not (request.POST['dueDate']!='' and request.POST['dueTime']!='' and request.POST["assignedModule"] and request.POST["assignedModule"]!='' and request.POST['quizName']!=''):
-            context = {"quizObjects": Quiz.objects.all, "error": "Please fill in all fields."}
+
+        questionsJSON = json.dumps(questionsJSON).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace(
+            "\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f").replace("'", "\u2019")
+
+        if not "assignedModule" in request.POST or not (request.POST['dueDate'] != '' and request.POST['dueTime'] != '' and request.POST["assignedModule"] and request.POST["assignedModule"] != '' and request.POST['quizName'] != ''):
+            context = {"quizObjects": Quiz.objects.all,
+                       "error": "Please fill in all fields."}
             return render(request, 'quizzes/manage.html', context)
 
         dueDate = request.POST['dueDate']
@@ -343,12 +329,9 @@ def createQuiz(request):
         dueDate += dueTime
         dueDateTime = datetime.strptime(dueDate, "%b %d, %Y%I:%M %p")
 
-        #find matching course
+        # find matching course
         assignedModuleID = request.POST["assignedModule"]
         assignedModule = Module.objects.get(pk=assignedModuleID)
-
-
-
 
         newQuiz = Quiz()
         newQuiz.quizName = request.POST['quizName']
@@ -373,54 +356,56 @@ def createQuiz(request):
         newQuiz.quizData = questionsJSON
         newQuiz.repeatNumber = 0
         newQuiz.save()
-        
-        context = {"quizObjects": Quiz.objects.all, "notification": "Successfully created quiz"}
-        return render(request, 'quizzes/manage.html', context)
 
+        context = {"quizObjects": Quiz.objects.all,
+                   "notification": "Successfully created quiz"}
+        return render(request, 'quizzes/manage.html', context)
 
     else:
         return render(request, 'quizzes/create.html', context)
 
 
-
-#quiz view page
+# quiz view page
 @login_required
 def viewQuiz(request, quizID):
     quizObj = Quiz.objects.get(quizID=quizID)
 
-    context = {"quizObject": quizObj, "rop": quizObj.randomOptions == 1, "rqn": quizObj.randomQuestions == 1}
+    context = {"quizObject": quizObj, "rop": quizObj.randomOptions ==
+               1, "rqn": quizObj.randomQuestions == 1}
 
     return render(request, 'quizzes/view.html', context)
 
 
-
-#quiz view page
+# quiz view page
 @login_required
 def doQuiz(request, quizID):
-    #if submitting form
+    # if submitting form
     if request.method == 'POST':
         responsesJSON = request.POST['submissionData']
-        responsesJSON = re.sub("_____var__", "", responsesJSON) #remove js stuff
+        responsesJSON = re.sub(
+            "_____var__", "", responsesJSON)  # remove js stuff
 
         score = len(re.findall(r'"isCorrect":true', responsesJSON))
 
         responsesJSON = json.loads(responsesJSON)
-        
+
         quizObj = Quiz.objects.get(quizName=responsesJSON[0]["quizName"])
         passingScore = quizObj.passingScore
         if score >= int(passingScore):
             responsesJSON[0]["isPassed"] = True
         else:
             responsesJSON[0]["isPassed"] = False
-        
-        responsesJSON = json.dumps(responsesJSON)
+
+        responsesJSON = json.dumps(responsesJSON).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace(
+            "\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f").replace("'", "\u2019")
 
         userId = request.user.id
-        user = User.objects.get(id = userId)
+        user = User.objects.get(id=userId)
         currentQuizResponses = user.quizResponses
 
         if currentQuizResponses and "__________RESPONSESPLITTER__________" in currentQuizResponses:
-            allQuizResponses = currentQuizResponses.split("__________RESPONSESPLITTER__________")[1:]
+            allQuizResponses = currentQuizResponses.split(
+                "__________RESPONSESPLITTER__________")[1:]
             for i in allQuizResponses:
                 quizName = ""
                 try:
@@ -434,50 +419,49 @@ def doQuiz(request, quizID):
             currentQuizResponses = str(user.quizResponses)
         else:
             currentQuizResponses = ""
-        user.quizResponses = currentQuizResponses + "__________RESPONSESPLITTER__________" + responsesJSON
-
+        user.quizResponses = currentQuizResponses + \
+            "__________RESPONSESPLITTER__________" + responsesJSON
 
         user.save()
-        
 
         return redirect("./")
 
-
-
-
-
-
     quizObj = Quiz.objects.get(quizID=quizID)
 
-    #if quizObj.quizDueDate > sgt.localize(datetime.now()):
-    context = {"quizObject": Quiz.objects.get(quizID=quizID), "rop": quizObj.randomOptions == 1, "rqn": quizObj.randomQuestions == 1}
+    # if quizObj.quizDueDate > sgt.localize(datetime.now()):
+    context = {"quizObject": Quiz.objects.get(
+        quizID=quizID), "rop": quizObj.randomOptions == 1, "rqn": quizObj.randomQuestions == 1}
 
     user = request.user
     quizResponseJSON = user.quizResponses
     if quizResponseJSON and "__________RESPONSESPLITTER__________" in quizResponseJSON:
-        allQuizResponses = quizResponseJSON.split("__________RESPONSESPLITTER__________")[1:]
+        allQuizResponses = quizResponseJSON.split(
+            "__________RESPONSESPLITTER__________")[1:]
         for i in allQuizResponses:
             if quizObj.quizName == json.loads(i)[0]["quizName"]:
-                #quiz done already
+                # quiz done already
 
-                
                 def searchForQn(questions, questionID):
                     for i in questions:
                         if i["questionID"] == questionID:
                             return i
 
-
-                quizObjToCombine = json.loads(Quiz.objects.get(quizID=quizID).quizData)
+                quizObjToCombine = json.loads(
+                    Quiz.objects.get(quizID=quizID).quizData)
 
                 quizResponsesToCombine = json.loads(i)[1:]
 
                 for j in quizObjToCombine:
-                    j.update(searchForQn(quizResponsesToCombine, j["questionID"]))
+                    j.update(searchForQn(
+                        quizResponsesToCombine, j["questionID"]))
 
-
-                context = {"quizObject": Quiz.objects.get(quizID=quizID), "responsesObject": json.dumps(quizObjToCombine), }
+                context = {"quizObject": Quiz.objects.get(
+                    quizID=quizID), "responsesObject": json.dumps(quizObjToCombine).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace(
+                    "\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f").replace("'", "\u2019"), }
                 return render(request, 'quizzes/viewAns.html', context)
     return render(request, 'quizzes/do.html', context)
+
+
 """
     else:
 
@@ -487,77 +471,61 @@ def doQuiz(request, quizID):
         """
 
 
-
-
-
-
-
-
-
 @login_required
-def viewQuizAns(request, quizNameEncoded, userId):   
+def viewQuizAns(request, quizNameEncoded, userId):
     quizName = base64.b64decode(quizNameEncoded).decode('utf-8')
 
     quizObj = Quiz.objects.get(quizName=quizName)
 
-    user = User.objects.get(id = userId)
+    user = User.objects.get(id=userId)
     quizResponseJSON = user.quizResponses
     if quizResponseJSON and "__________RESPONSESPLITTER__________" in quizResponseJSON:
-        allQuizResponses = quizResponseJSON.split("__________RESPONSESPLITTER__________")[1:]
+        allQuizResponses = quizResponseJSON.split(
+            "__________RESPONSESPLITTER__________")[1:]
         for i in allQuizResponses:
             if quizObj.quizName == json.loads(i)[0]["quizName"]:
-                #quiz done already
+                # quiz done already
 
-                
                 def searchForQn(questions, questionID):
                     for i in questions:
                         if i["questionID"] == questionID:
                             return i
-
 
                 quizObjToCombine = json.loads(quizObj.quizData)
 
                 quizResponsesToCombine = json.loads(i)[1:]
 
                 for j in quizObjToCombine:
-                    j.update(searchForQn(quizResponsesToCombine, j["questionID"]))
+                    j.update(searchForQn(
+                        quizResponsesToCombine, j["questionID"]))
 
-
-                context = {"quizObject": quizObj, "responsesObject": json.dumps(quizObjToCombine), }
+                context = {"quizObject": quizObj,
+                           "responsesObject": json.dumps(quizObjToCombine).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace(
+                               "\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f").replace("'", "\u2019"), }
                 return render(request, 'quizzes/viewAns.html', context)
     else:
         return doQuiz(request, quizObj.quizID)
 
 
-
-
-
-
-
-
-
-
-
-
-
-#quiz edit page
+# quiz edit page
 @login_required
 def editQuiz(request, quizID):
-    
-    #if submitting form
+
+    # if submitting form
     if request.method == 'POST':
         questionsJSON = request.POST['allQuestionsJSON']
-        questionsJSON = re.sub("_____var__", "", questionsJSON) #remove js stuff
-        questionsJSON = questionsJSON.replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace("\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f")
-        
+        questionsJSON = re.sub(
+            "_____var__", "", questionsJSON)  # remove js stuff
+        questionsJSON = questionsJSON.replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace("\\&", "\\\\&").replace(
+            "\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f").replace("'", "\u2019")
+
         dueDate = request.POST['dueDate']
         dueTime = request.POST['dueTime']
 
         dueDate += dueTime
         dueDateTime = datetime.strptime(dueDate, "%b %d, %Y%I:%M %p")
 
-
-        #find matching course
+        # find matching course
 
         newQuiz = Quiz.objects.get(quizID=request.POST['quizID'])
         if 'passingScore' in request.POST and request.POST['passingScore'] != '':
@@ -565,7 +533,7 @@ def editQuiz(request, quizID):
         else:
             newQuiz.passingScore = 0
         newQuiz.quizName = request.POST['quizName']
-        
+
         if 'ranQn' in request.POST:
             newQuiz.randomQuestions = 1
         else:
@@ -579,10 +547,10 @@ def editQuiz(request, quizID):
         newQuiz.quizDueDate = sgt.localize(dueDateTime)
         newQuiz.quizData = questionsJSON
         newQuiz.save()
-        
-        context = {"quizObjects": Quiz.objects.all, "notification": "Successfully edited quiz", }
-        return render(request, 'quizzes/manage.html', context)
 
+        context = {"quizObjects": Quiz.objects.all,
+                   "notification": "Successfully edited quiz", }
+        return render(request, 'quizzes/manage.html', context)
 
     else:
         quizObj = Quiz.objects.get(quizID=quizID)
@@ -593,30 +561,32 @@ def editQuiz(request, quizID):
         passingScore = quizObj.passingScore
 
         module = quizObj.module
-        availableTags = ", ".join( ['"{}"'.format(x) for x in list(set(list(module.course.quizTags.split(","))))] )
+        availableTags = ", ".join(['"{}"'.format(x) for x in list(
+            set(list(module.course.quizTags.split(","))))])
 
-        
         courseObjects = list(Course.objects.all())
         courseIDs = [i.id for i in courseObjects]
 
-        context = {"rqn": quizObj.randomQuestions == 1, "rop": quizObj.randomOptions == 1, "qbank": Question.objects.all, "courseObjects": courseObjects, "courseIDs": courseIDs ,"modObjects": Module.objects.all, "quizObject": quizObj, "dueDate": dueDate, "dueTime": dueTime, "passingScore": passingScore, "availableTags": availableTags, "module": module}
+        context = {"rqn": quizObj.randomQuestions == 1, "rop": quizObj.randomOptions == 1, "qbank": Question.objects.all, "courseObjects": courseObjects, "courseIDs": courseIDs,
+                   "modObjects": Module.objects.all, "quizObject": quizObj, "dueDate": dueDate, "dueTime": dueTime, "passingScore": passingScore, "availableTags": availableTags, "module": module}
         return render(request, 'quizzes/edit.html', context)
-    
+
 
 def deleteQuiz(request):
     if request.method == 'POST':
-        
+
         quizID = request.POST['quizID']
-        quiz = Quiz.objects.get(quizID = quizID)
+        quiz = Quiz.objects.get(quizID=quizID)
 
         quiz.delete()
 
-
-        context = {"quizObjects": Quiz.objects.all, "notification": "Deleted quiz", }
+        context = {"quizObjects": Quiz.objects.all,
+                   "notification": "Deleted quiz", }
 
         return render(request, 'quizzes/manage.html', context)
 
     else:
-        context = {"quizObjects": Quiz.objects.all, "error": "unable to delete quiz", }
+        context = {"quizObjects": Quiz.objects.all,
+                   "error": "unable to delete quiz", }
 
         return render(request, 'quizzes/manage.html', context)
