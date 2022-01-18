@@ -396,8 +396,7 @@ def doQuiz(request, quizID):
         else:
             responsesJSON[0]["isPassed"] = False
 
-        responsesJSON = json.dumps(responsesJSON).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace(
-            "\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f").replace("'", "\u2019")
+        responsesJSON = json.dumps(responsesJSON).replace("'", "\u2019")
 
         userId = request.user.id
         user = User.objects.get(id=userId)
@@ -456,8 +455,7 @@ def doQuiz(request, quizID):
                         quizResponsesToCombine, j["questionID"]))
 
                 context = {"quizObject": Quiz.objects.get(
-                    quizID=quizID), "responsesObject": json.dumps(quizObjToCombine).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace(
-                    "\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f").replace("'", "\u2019"), }
+                    quizID=quizID), "responsesObject": json.dumps(quizObjToCombine).replace("'", "\u2019"), }
                 return render(request, 'quizzes/viewAns.html', context)
     return render(request, 'quizzes/do.html', context)
 
@@ -500,8 +498,7 @@ def viewQuizAns(request, quizNameEncoded, userId):
                         quizResponsesToCombine, j["questionID"]))
 
                 context = {"quizObject": quizObj,
-                           "responsesObject": json.dumps(quizObjToCombine).replace("\\n", "\\\\n").replace("\\'", "\\\\'").replace('\\"', '\\\\"').replace(
-                               "\\&", "\\\\&").replace("\\r", "\\\\r").replace("\\t", "\\\\t").replace("\\b", "\\\\b").replace("\\f", "\\\\f").replace("'", "\u2019"), }
+                           "responsesObject": json.dumps(quizObjToCombine).replace("'", "\u2019"), }
                 return render(request, 'quizzes/viewAns.html', context)
     else:
         return doQuiz(request, quizObj.quizID)
