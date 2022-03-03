@@ -8,12 +8,15 @@ import json
 # Create your models here.
 
 class Course(models.Model):
-    
-    courseName = models.CharField(max_length=200, verbose_name="course name")
-    courseInstitution = models.CharField(max_length=200, verbose_name="institution", null=True)
-    courseDescription = models.CharField(max_length=5000, verbose_name="course description", null=True, default=None)
 
-    courseCode = models.CharField(max_length=200, verbose_name="course code", null=True)
+    courseName = models.CharField(max_length=200, verbose_name="course name")
+    courseInstitution = models.CharField(
+        max_length=200, verbose_name="institution", null=True)
+    courseDescription = models.CharField(
+        max_length=5000, verbose_name="course description", null=True, default=None)
+
+    courseCode = models.CharField(
+        max_length=200, verbose_name="course code", null=True)
 
     quizTags = models.CharField(max_length=5000)
 
@@ -23,15 +26,15 @@ class Course(models.Model):
     def getTags(self):
         return json.loads(self.quizTags)
 
-
     def __str__(self):
-         return self.courseName
+        return self.courseName
 
 
 class StudentClass(models.Model):
 
     className = models.CharField(max_length=200, verbose_name="class name")
-    classInstitution = models.CharField(max_length=200, verbose_name="institution", null=True)
+    classInstitution = models.CharField(
+        max_length=200, verbose_name="institution", null=True)
     courses = models.ManyToManyField(Course, blank=True)
 
     class Meta:
@@ -40,34 +43,46 @@ class StudentClass(models.Model):
     def __str__(self):
         return self.className
 
+
 class Module(models.Model):
 
     moduleName = models.CharField(max_length=200, verbose_name="module name")
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    
+
     def __str__(self):
         return self.moduleName
+
 
 class User(AbstractUser):
 
     institution = models.CharField(max_length=200, blank=True, null=True)
-    phoneNumber = models.CharField(verbose_name="phone number", max_length=20, blank=True, null=True, default=None)
-    profilePic = models.ImageField(storage=MediaStorage(), verbose_name="Profile picture", blank=True) 
-    
+    phoneNumber = models.CharField(
+        verbose_name="phone number", max_length=20, blank=True, null=True, default=None)
+    profilePic = models.ImageField(
+        storage=MediaStorage(), verbose_name="Profile picture", blank=True)
+
     ACC_TYPES = [
         ('Teacher', 'Teacher'),
         ('Student', 'Student'),
     ]
-    accountType = models.CharField(verbose_name="account type", max_length=16, choices=ACC_TYPES, default="Administrator")
+    accountType = models.CharField(
+        verbose_name="account type", max_length=16, choices=ACC_TYPES, default="Administrator")
     classes = models.ManyToManyField(StudentClass, blank=True)
 
-    quizResponses = models.CharField(max_length=1000000000, verbose_name="quizResponses", null=True, blank=True)
+    quizResponses = models.CharField(
+        max_length=1000000000, verbose_name="quizResponses", null=True, blank=True)
 
-    timeOnline = models.DurationField(verbose_name="timeOnline", blank=True, null=True)
+    timeOnline = models.DurationField(
+        verbose_name="timeOnline", blank=True, null=True)
 
-    startDate = models.DateField(blank=True, null=True, verbose_name="Start date")
+    startDate = models.DateField(
+        blank=True, null=True, verbose_name="Start date")
     designation = models.CharField(max_length=500, blank=True, null=True)
-    
+
+    notificationAccess = models.BooleanField(
+        default=False, verbose_name="Notification Access", help_text="Designates whether the user can send notifications")
+
+    notificationsSeen = models.ManyToManyField("notifications.Notification")
 
     def __str__(self):
         return self.username

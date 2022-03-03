@@ -64,6 +64,14 @@
       <li><a href='/courses/'>Courses</a></li>
       <li><a href='/account/{{ user.id }}'>My Account</a></li>
       <li><a href='/account/manage/'>Manage Account</a></li>
+      
+      <!-- if notification access -->
+      {% if user.notificationAccess %}
+      <li><a href="/notifications/manage/">Notifications</a></li>
+      {% else %}
+      <li><a href="/notifications/">Notifications</a></li>
+      {% endif %}
+
       <li><a href='/logout/'>Log Out</a></li>
       {% else %}
       <li><a href='/login/'>Login</a></li>
@@ -113,6 +121,14 @@
               <li><a href='/courses/'>Courses</a></li>
               <li><a href='/account/{{ user.id }}'>My Account</a></li>
               <li><a href='/account/manage/'>Manage Account</a></li>
+          
+              <!-- if notification access -->
+              {% if user.notificationAccess %}
+              <li><a href="/notifications/manage/">Notifications</a></li>
+              {% else %}
+              <li><a href="/notifications/">Notifications</a></li>
+              {% endif %}
+              
               <li><a href='/logout/'>Log Out</a></li>
               {% else %}
               <li><a class="waves-effect waves-light btn" style="height:auto; background-color: #db3833; border-radius: 1000px; text-transform: none;" href='/login/'>Login</a></li>
@@ -147,6 +163,14 @@
           <li><a href='/classes/'>Classes</a></li>
           <li><a href='/courses/'>Courses</a></li>
           <li><a href='/account/manage/'>Manage Account</a></li>
+          
+          <!-- if notification access -->
+          {% if user.notificationAccess %}
+          <li><a href="/notifications/manage/">Notifications</a></li>
+          {% else %}
+          <li><a href="/notifications/">Notifications</a></li>
+          {% endif %}
+          
           <li><a href='/logout/'>Log Out</a></li>
           {% else %}
           <li><a href='/login/' style="padding-top: 50px;">Login</a></li>

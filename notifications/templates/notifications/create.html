@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Notification{% endblock %}
+
+
+{% block css %}
+{% endblock %}
+
+
+
+{% block content %}
+<a class="waves-effect waves-black btn-flat" href="/notifications/"><i class="material-icons left" style="margin-right: 0px;">arrow_back_ios</i>Back</a>
+
+
+<h2 class="center-align">Create Notification</h2>
+
+<form method="POST" id="createLessonForm">{% csrf_token %}
+    <div class="row">
+        <div class="input-field col s12 m6">
+            <i class="material-icons text-accent-1 prefix">mode_edit</i>
+            <input class="black-text" type="text" name="title" id="id_lessonName" autofocus required>
+            <label class="black-text" for="id_lessonName">Title</label>
+        </div>
+        <div class="input-field col s12 m6">
+            <select multiple name="selectedClasses">
+              <option value="" disabled selected>Classes</option>
+              {% for i in classObjects %}
+              <option value="{{i.pk}}">{{i.className}}</option>
+              {% endfor %}
+            </select>
+            <label>Classes</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="input-field col s12 m6">
+            <i class="material-icons text-accent-1 prefix">today</i>
+            <input type="text" name="start" class="datepicker" id="id_startDate" required>
+            <label class="black-text" for="id_startDate">Release date</label>
+        </div>  
+        <div class="input-field col s12 m6">
+            <i class="material-icons text-accent-1 prefix">today</i>
+            <input type="text" name="end" class="datepicker" id="id_endDate" required>
+            <label class="black-text" for="id_endDate">End date</label>
+        </div>  
+    </div>
+
+    <div class="row">
+        <textarea name='content'>
+            Notification text
+        </textarea>
+    </div>
+
+    <div class="row">
+        <button class="btn accent-1" type="submit" name="action">Submit
+            <i class="material-icons right">send</i>
+        </button>
+    </div>
+
+</form>
+
+
+
+
+
+
+{% endblock %}
+
+
+
+
+{% block javascript %}
+<script src="https://cdn.tiny.cloud/1/1lkia8kc497mp2p1i8ogfok28uhfj6refiuva2rk63566m76/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@2.3.1/build/global/luxon.min.js"></script>
+<script>
+    var DateTime = luxon.DateTime;
+
+    $(document).ready(function(){
+        $('select').formSelect();
+
+        var startDateElem = document.querySelectorAll("#id_startDate");
+        var endDateElem = document.querySelectorAll("#id_endDate");
+        var now = new Date()
+        var startdateobj = M.Datepicker.init(startDateElem, {defaultDate: new Date(), minDate: new Date(), setDefaultDate: true, onSelect: startDateSelected} )[0];
+        var enddateobj = M.Datepicker.init(endDateElem, {defaultDate: DateTime.fromMillis(now.getTime()).plus({months:6}).toJSDate(), minDate: new Date(), maxDate: DateTime.fromMillis(now.getTime()).plus({months:6}).toJSDate(), setDefaultDate: true} )[0];
+
+    
+        function startDateSelected(d) {
+            const newDate = new Date(d);
+            const endDate = enddateobj.date;
+
+            const newEnd = DateTime.fromMillis(newDate.getTime()).plus({months:6})
+
+            if (newDate.getTime() > endDate.getTime()){
+                enddateobj.setDate(newEnd.toJSDate());
+                const endDateElem = document.getElementById("id_endDate");
+                endDateElem.value =  newEnd.toFormat("LLL dd, yyyy");
+            }
+
+            if( DateTime.fromMillis(newDate.getTime()).diff( DateTime.fromMillis(endDate.getTime()), 'months' ).months > 6 ){
+                enddateobj.setDate(newEnd.toJSDate());
+                const endDateElem = document.getElementById("id_endDate");
+                endDateElem.value =  newEnd.toFormat("LLL dd, yyyy");
+            }
+
+            enddateobj.maxDate = newEnd;
+            enddateobj.minDate = newDate;
+    
+        }
+
+        $('.timepicker').timepicker();
+    });
+
+    tinymce.init({
+        selector: 'textarea',
+        plugins: 'autolink link autoresize lists table emoticons',
+        toolbar: 'styleselect bold underline italic strikethrough subscript superscript link blockquote forecolor backcolor removeformat lineheight numlist bullist indent outdent table tabledelete emoticons format',
+        menubar: 'edit insert format table'      
+    });
+</script>
+{% endblock %}

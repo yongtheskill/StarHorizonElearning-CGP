@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}View Notifications{% endblock %}
+
+
+{% block css %}    
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<h2 class="center-align">View Notifications</h2>
+
+
+<div style="padding-bottom: 20px;">
+{% if notifications %}
+    {% for notif in notifications %}
+    <div style="background-color: #fff; border-radius: 10px; margin-top: 20px; box-shadow: 3px 4px 10px #aaa;">
+        <div style="padding: 10px 20px 10px 20px;">
+            <h5 style="font-weight: 700;">{{notif.title}}</h5>
+            {{ notif.content | safe }}
+            <div style="width: 100%; text-align: right;">
+                {{ notif.start | date:"l, d M, Y" }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+</div>
+
+{% endblock %}
+
+
+
+
+{% block javascript %}
+<script>
+    async function deleteNotification(id){
+        await fetch("/notifications/delete/"+id.toString());
+        window.location.replace("/notifications/manage");
+    }
+</script>
+{% endblock %}

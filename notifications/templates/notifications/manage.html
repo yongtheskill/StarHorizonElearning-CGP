@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Notifications{% endblock %}
+
+
+{% block css %}    
+<style>
+/* list styling */
+ul.collection {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+th, td {
+    text-align: center;
+}
+
+/* Add Button */
+.addQuizBtn {
+  float: right;
+  padding-top: 20px;
+}
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<h2 class="center-align">Manage Notifications</h2>
+
+
+<div id="all" class="col s12">
+    <table style="margin-top: 10px;">
+        <thead>
+          <tr>
+              <th>Title</th>
+              <th>Release Date</th>
+              <th>End Date</th>
+              <th>Edit</th>
+              <th>Delete</th>
+          </tr>
+        </thead>
+
+        <tbody>
+            {% for i in notifications %}
+            <tr>
+                <td>{{ i.title }}</td>
+                <td>{{ i.start | date:"l, d M, Y" }}</td>
+                <td>{{ i.end | date:"l, d M, Y" }}</td>
+                <td><a href="/notifications/edit/{{ i.pk }}"><i class="material-icons text-accent-1">edit</i></a></td>
+                <td><a href="#" onclick="deleteNotification({{ i.pk }})"><i class="material-icons text-accent-1">delete</i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- add button -->
+<div class="addQuizBtn">
+    <a class="btn-floating btn-large accent-1" href="/notifications/create">
+        <i class="large material-icons">note_add</i>
+    </a>
+</div>
+
+{% endblock %}
+
+
+
+
+{% block javascript %}
+<script>
+    async function deleteNotification(id){
+        await fetch("/notifications/delete/"+id.toString());
+        window.location.replace("/notifications/manage");
+    }
+</script>
+{% endblock %}
