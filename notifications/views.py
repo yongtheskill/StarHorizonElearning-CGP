@@ -18,16 +18,20 @@ sgt = pytz.timezone("Asia/Singapore")
 def viewNotifications(request):
     classes = request.user.classes.all()
     classIds = [i.pk for i in classes]
-    notifications = Notification.objects.filter(studentClasses__in=classIds).distinct()
+    now = sgt.localize(datetime.now())
+
+    notifications = Notification.objects.filter(
+        studentClasses__in=classIds).distinct().filter(start__lte=now)
 
     modified = False
     for i in notifications:
-        if i.end < sgt.localize(datetime.now()):
+        if i.end < now:
             i.delete()
             modified = True
-    
+
     if modified:
-        notifications = Notification.objects.filter(studentClasses__in=classIds).distinct()
+        notifications = Notification.objects.filter(
+            studentClasses__in=classIds).distinct().filter(start__lte=now)
 
     return render(request, 'notifications/view.html', {"notifications": notifications})
 
@@ -65,7 +69,8 @@ def createNotification(request):
         newNotification.title = title
         newNotification.content = content
 
-        newNotification.start = sgt.localize(datetime.strptime(start, "%b %d, %Y"))
+        newNotification.start = sgt.localize(
+            datetime.strptime(start, "%b %d, %Y"))
         newNotification.end = sgt.localize(datetime.strptime(end, "%b %d, %Y"))
 
         newNotification.save()
@@ -76,8 +81,8 @@ def createNotification(request):
                 sClass = StudentClass.objects.get(id=id)
                 newNotification.studentClasses.add(sClass)
 
-
-        context = {"notification": "Successfully created notification", "notifications": Notification.objects.all()}
+        context = {"notification": "Successfully created notification",
+                   "notifications": Notification.objects.all()}
         return render(request, 'notifications/manage.html', context)
 
     else:
@@ -108,7 +113,8 @@ def editNotification(request, NotificationID):
                 sClass = StudentClass.objects.get(id=id)
                 notification.studentClasses.add(sClass)
 
-        context = {"notification": "Successfully edited live lesson", "notifications": Notification.objects.all()}
+        context = {"notification": "Successfully edited live lesson",
+                   "notifications": Notification.objects.all()}
         return render(request, 'notifications/manage.html', context)
 
     else:
@@ -117,7 +123,8 @@ def editNotification(request, NotificationID):
 
         classIds = [i.pk for i in notification.studentClasses.all()]
 
-        context = {"classObjects": StudentClass.objects.all, "notif": notification, "start": start, "end": end, "classIds": classIds }
+        context = {"classObjects": StudentClass.objects.all,
+                   "notif": notification, "start": start, "end": end, "classIds": classIds}
         return render(request, 'notifications/edit.html', context)
 
 

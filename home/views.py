@@ -18,8 +18,10 @@ def home(request):
         if not request.user.notificationAccess:
             classes = request.user.classes.all()
             classIds = [i.pk for i in classes]
+            now = sgt.localize(datetime.datetime.now())
+
             notifications = Notification.objects.filter(
-                studentClasses__in=classIds).distinct()
+                studentClasses__in=classIds).distinct().filter(start__lte=now)
 
             notificationsSeen = request.user.notificationsSeen.all()
 
@@ -36,18 +38,19 @@ def home(request):
 def readNotifications(request):
     classes = request.user.classes.all()
     classIds = [i.pk for i in classes]
+    now = sgt.localize(datetime.datetime.now())
     notifications = Notification.objects.filter(
-        studentClasses__in=classIds).distinct()
+        studentClasses__in=classIds).distinct().filter(start__lte=now)
 
     modified = False
     for i in notifications:
-        if i.end < sgt.localize(datetime.datetime.now()):
+        if i.end < now:
             i.delete()
             modified = True
 
     if modified:
         notifications = Notification.objects.filter(
-            studentClasses__in=classIds).distinct()
+            studentClasses__in=classIds).distinct().filter(start__lte=now)
 
     request.user.notificationsSeen.clear()
     request.user.notificationsSeen.add(*notifications)
