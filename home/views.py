@@ -1,3 +1,4 @@
+from notifications.models import Notification
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -9,51 +10,54 @@ import pytz
 
 sgt = pytz.timezone("Asia/Singapore")
 
-from notifications.models import Notification
 
-
-#home page
+# home page
 def home(request):
     context = {"isHome": True}
     if request.user.is_authenticated:
         if not request.user.notificationAccess:
             classes = request.user.classes.all()
             classIds = [i.pk for i in classes]
-            notifications = Notification.objects.filter(studentClasses__in=classIds).distinct()
+            notifications = Notification.objects.filter(
+                studentClasses__in=classIds).distinct()
 
             notificationsSeen = request.user.notificationsSeen.all()
 
             notificationsUnseen = notifications.difference(notificationsSeen)
-            context = {"isHome": True,  "notificationsUnseen": notificationsUnseen}
+            context = {"isHome": True,
+                       "notificationsUnseen": notificationsUnseen}
 
     return render(request, 'home/home.html', context)
 
-#acknowledge notifs
+# acknowledge notifs
+
+
 @login_required
 def readNotifications(request):
     classes = request.user.classes.all()
     classIds = [i.pk for i in classes]
-    notifications = Notification.objects.filter(studentClasses__in=classIds).distinct()
-    
+    notifications = Notification.objects.filter(
+        studentClasses__in=classIds).distinct()
 
     modified = False
     for i in notifications:
-        if i.end < sgt.localize(datetime.now()):
+        if i.end < sgt.localize(datetime.datetime.now()):
             i.delete()
             modified = True
-    
+
     if modified:
-        notifications = Notification.objects.filter(studentClasses__in=classIds).distinct()
-        
+        notifications = Notification.objects.filter(
+            studentClasses__in=classIds).distinct()
+
     request.user.notificationsSeen.clear()
     request.user.notificationsSeen.add(*notifications)
     return HttpResponse("Ok")
 
 
-#timer
+# timer
 def addTime(request, username):
     try:
-        userObject = User.objects.get(username = username)
+        userObject = User.objects.get(username=username)
 
         if not userObject.timeOnline:
             userObject.timeOnline = datetime.timedelta(seconds=0)
@@ -70,6 +74,6 @@ def whiteboard(request):
     return render(request, 'home/whiteboard.html', {})
 
 
-#data demo
+# data demo
 def dataDemo(request):
     return render(request, 'home/dataDemo.html', {})
