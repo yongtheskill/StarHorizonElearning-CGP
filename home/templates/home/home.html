@@ -96,8 +96,8 @@
   
     <div class="white hide-on-large-only" style="position: fixed; left: 0; bottom: 0; width: 100vw;">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-direction: column;">
-            <div style="padding-top: 12px;">
-            © 2021 Cornerstone Global Partners Pte Ltd
+            <div style="padding-top: 12px;" id="copyrightText">
+            © 2022 Cornerstone Global Partners Pte Ltd
             </div>
             <div style="display: flex; align-items: center;"> 
                 <div style="padding-right: 30px; display: inline;"><a class="black-text" href="{% static "docs/Terms of User (Trainer and DA).pdf" %}">Terms of Use</a></div>
@@ -110,8 +110,8 @@
 
     <div class="white hide-on-med-and-down" style="position: fixed; left: 0; bottom: 0; width: 100%; padding-bottom: 10px;">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="padding-top: 12px;">
-            © 2021 Cornerstone Global Partners Pte Ltd
+            <div style="padding-top: 12px;" id="copyrightTextD">
+            © 2022 Cornerstone Global Partners Pte Ltd
             </div>
             <div style="padding-top: 12px; display: flex; align-items: center;"> 
                 <div style="padding-right: 30px; display: inline;"><a class="black-text" href="{% static "docs/Terms of User (Trainer and DA).pdf" %}">Terms of Use</a></div>
@@ -121,6 +121,11 @@
         
         </div>
     </div>
+    
+    <script>
+        document.getElementById("copyrightText").innerHTML = `© ${new Date().getFullYear()} Cornerstone Global Partners Pte Ltd`;
+        document.getElementById("copyrightTextD").innerHTML = `© ${new Date().getFullYear()} Cornerstone Global Partners Pte Ltd`;
+    </script>
 {% endblock %}
 
 
@@ -135,6 +140,7 @@
         window.location.reload();
     }
 </script>
+
 
 
 {% if isongoingstream %}
