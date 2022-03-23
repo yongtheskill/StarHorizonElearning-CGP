@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django import forms
 
 from .models import User, Course, StudentClass, Module
@@ -34,14 +36,79 @@ class CourseAdmin(admin.ModelAdmin):
         return self.courseName
 
 
+class StudentAdminForm(forms.ModelForm):
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple(
+            verbose_name=_('Users'),
+            is_stacked=False
+        )
+    )
+
+    class Meta:
+        model = StudentClass
+        exclude = tuple()
+
+    def __init__(self, *args, **kwargs):
+        super(StudentAdminForm, self).__init__(*args, **kwargs)
+
+        if self.instance and self.instance.pk:
+            self.fields['users'].initial = self.instance.users.all()
+
+    def save(self, commit=True):
+        studentclass = super(StudentAdminForm, self).save(commit=False)
+
+        if commit:
+            studentclass.save()
+
+        if studentclass.pk:
+            studentclass.users = self.cleaned_data['users']
+            self.save_m2m()
+
+        return studentclass
+
+
+"""
+class StudentAdminForm(forms.ModelForm):
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple(
+            verbose_name=_('Users'),
+            is_stacked=False
+        )
+    )
+
+    class Meta:
+        model = StudentClass
+        exclude = tuple()
+
+    def __init__(self, *args, **kwargs):
+        super(StudentAdminForm, self).__init__(*args, **kwargs)
+
+        if self.instance and self.instance.pk and hasattr(self.instance, 'className'):
+            print(vars(self.instance))
+            self.fields['users'].initial = User.objects.filter(
+                classes__id=self.instance.id)
+
+    def save(self, commit=True):
+        studentclass = super(StudentAdminForm, self).save(commit=False)
+
+        if commit:
+            studentclass.save()
+
+        if studentclass.pk:
+            studentclass.users = self.cleaned_data['users']
+            self.save_m2m()
+
+        return studentclass
+"""
+
+
 class StudentClassAdmin(admin.ModelAdmin):
 
-    readonly_fields = ('id', )
-
-    fieldsets = (
-        (None, {'fields': ('className',)}),
-        ('Details', {'fields': ('classInstitution', 'courses', 'id')}),
-    )
+    form = StudentAdminForm
 
     filter_horizontal = ('courses',)
 
@@ -100,10 +167,10 @@ class UserAdmin(BaseUserAdmin):
         ('Administration info', {'fields': (
             'startDate', 'designation', 'accountType', 'institution', 'notificationAccess')}),
         ('Course info', {'fields': ('classes', )}),
-        #('Quiz Responses', {'fields': ('quizResponses', )}),
+        # ('Quiz Responses', {'fields': ('quizResponses', )}),
         ('Time Online', {'fields': ('timeOnline', )}),
         ('Permissions', {'fields': ('is_staff', 'groups',)}),
-        #('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions', )}),
+        # ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions', )}),
     )
     add_fieldsets = (
         (None, {
