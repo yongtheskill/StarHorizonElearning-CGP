@@ -63,7 +63,7 @@ class StudentAdminForm(forms.ModelForm):
             studentclass.save()
 
         if studentclass.pk:
-            studentclass.users = self.cleaned_data['users']
+            studentclass.users.set(self.cleaned_data['users'])
             self.save_m2m()
 
         return studentclass
