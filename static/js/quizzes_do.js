@@ -135,8 +135,9 @@ function cbAnsChanged(qID, checkboxIndex) {
 
 
 
-function setQuizName(quizName){
+function setQuizDeets(quizName, quizID){
     questionResponses.push({"quizName": quizName});
+    questionResponses[0]["quizID"] = quizID;
 }
 
 

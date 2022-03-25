@@ -69,43 +69,6 @@ class StudentAdminForm(forms.ModelForm):
         return studentclass
 
 
-"""
-class StudentAdminForm(forms.ModelForm):
-    users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
-        required=False,
-        widget=FilteredSelectMultiple(
-            verbose_name=_('Users'),
-            is_stacked=False
-        )
-    )
-
-    class Meta:
-        model = StudentClass
-        exclude = tuple()
-
-    def __init__(self, *args, **kwargs):
-        super(StudentAdminForm, self).__init__(*args, **kwargs)
-
-        if self.instance and self.instance.pk and hasattr(self.instance, 'className'):
-            print(vars(self.instance))
-            self.fields['users'].initial = User.objects.filter(
-                classes__id=self.instance.id)
-
-    def save(self, commit=True):
-        studentclass = super(StudentAdminForm, self).save(commit=False)
-
-        if commit:
-            studentclass.save()
-
-        if studentclass.pk:
-            studentclass.users = self.cleaned_data['users']
-            self.save_m2m()
-
-        return studentclass
-"""
-
-
 class StudentClassAdmin(admin.ModelAdmin):
 
     form = StudentAdminForm

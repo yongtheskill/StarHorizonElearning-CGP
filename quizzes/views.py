@@ -389,7 +389,8 @@ def doQuiz(request, quizID):
 
         responsesJSON = json.loads(responsesJSON)
 
-        quizObj = Quiz.objects.get(quizName=responsesJSON[0]["quizName"])
+        print(responsesJSON)
+        quizObj = Quiz.objects.get(quizID=responsesJSON[0]["quizID"])
         passingScore = quizObj.passingScore
         if score >= int(passingScore):
             responsesJSON[0]["isPassed"] = True
@@ -406,10 +407,10 @@ def doQuiz(request, quizID):
             allQuizResponses = currentQuizResponses.split(
                 "__________RESPONSESPLITTER__________")[1:]
             for i in allQuizResponses:
-                quizName = ""
+                quizID = ""
                 try:
-                    quizName = json.loads(i)[0]["quizName"]
-                    if quizName == quizObj.quizName:
+                    quizID = json.loads(i)[0]["quizID"]
+                    if quizID == quizObj.quizID:
                         return redirect("./")
                 except:
                     pass
@@ -437,7 +438,7 @@ def doQuiz(request, quizID):
         allQuizResponses = quizResponseJSON.split(
             "__________RESPONSESPLITTER__________")[1:]
         for i in allQuizResponses:
-            if quizObj.quizName == json.loads(i)[0]["quizName"]:
+            if quizObj.quizID == json.loads(i)[0]["quizID"]:
                 # quiz done already
 
                 def searchForQn(questions, questionID):
