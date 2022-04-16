@@ -438,26 +438,29 @@ def doQuiz(request, quizID):
         allQuizResponses = quizResponseJSON.split(
             "__________RESPONSESPLITTER__________")[1:]
         for i in allQuizResponses:
-            if quizObj.quizID == json.loads(i)[0]["quizID"]:
-                # quiz done already
+            try:
+                if quizObj.quizID == json.loads(i)[0]["quizID"]:
+                    # quiz done already
 
-                def searchForQn(questions, questionID):
-                    for i in questions:
-                        if i["questionID"] == questionID:
-                            return i
+                    def searchForQn(questions, questionID):
+                        for i in questions:
+                            if i["questionID"] == questionID:
+                                return i
 
-                quizObjToCombine = json.loads(
-                    Quiz.objects.get(quizID=quizID).quizData)
+                    quizObjToCombine = json.loads(
+                        Quiz.objects.get(quizID=quizID).quizData)
 
-                quizResponsesToCombine = json.loads(i)[1:]
+                    quizResponsesToCombine = json.loads(i)[1:]
 
-                for j in quizObjToCombine:
-                    j.update(searchForQn(
-                        quizResponsesToCombine, j["questionID"]))
+                    for j in quizObjToCombine:
+                        j.update(searchForQn(
+                            quizResponsesToCombine, j["questionID"]))
 
-                context = {"quizObject": Quiz.objects.get(
-                    quizID=quizID), "responsesObject": json.dumps(quizObjToCombine).replace("'", "\u2019"), }
-                return render(request, 'quizzes/viewAns.html', context)
+                    context = {"quizObject": Quiz.objects.get(
+                        quizID=quizID), "responsesObject": json.dumps(quizObjToCombine).replace("'", "\u2019"), }
+                    return render(request, 'quizzes/viewAns.html', context)
+            except:
+                continue
     return render(request, 'quizzes/do.html', context)
 
 
