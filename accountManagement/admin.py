@@ -130,7 +130,7 @@ class UserAdmin(BaseUserAdmin):
         ('Administration info', {'fields': (
             'startDate', 'designation', 'accountType', 'institution', 'notificationAccess')}),
         ('Course info', {'fields': ('classes', )}),
-        # ('Quiz Responses', {'fields': ('quizResponses', )}),
+        ('Quiz Responses', {'fields': ('quizResponses', )}),
         ('Time Online', {'fields': ('timeOnline', )}),
         ('Permissions', {'fields': ('is_staff', 'groups',)}),
         # ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions', )}),
