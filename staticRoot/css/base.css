@@ -141,3 +141,7 @@ nav {
 .addBtnClose {
   float: right;
 }
+
+.dropdown-content {
+  transform: none !important;
+}
