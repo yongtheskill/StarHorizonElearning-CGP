@@ -389,7 +389,6 @@ def doQuiz(request, quizID):
 
         responsesJSON = json.loads(responsesJSON)
 
-        print(responsesJSON)
         quizObj = Quiz.objects.get(quizID=responsesJSON[0]["quizID"])
         passingScore = quizObj.passingScore
         if score >= int(passingScore):
