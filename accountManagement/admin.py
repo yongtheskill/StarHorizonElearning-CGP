@@ -4,6 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django import forms
 
+from quizzes.models import QuestionTag
+
 from .models import User, Course, StudentClass, Module
 
 from django.contrib.auth.models import Group
@@ -21,6 +23,14 @@ class ModuleInline(admin.TabularInline):
     can_delete = False
 
 
+class TagsInline(admin.TabularInline):
+    model = QuestionTag
+    extra = 0
+    max_num = 0
+    readonly_fields = ('text',)
+    can_delete = False
+
+
 class CourseAdmin(admin.ModelAdmin):
 
     readonly_fields = ('id', )
@@ -28,9 +38,9 @@ class CourseAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('courseName',)}),
         ('Details', {'fields': ('courseInstitution',
-         'courseDescription', 'quizTags', 'id')}),
+         'courseDescription', 'id')}),
     )
-    inlines = [ModuleInline, ]
+    inlines = [ModuleInline, TagsInline]
 
     def __str__(self):
         return self.courseName
