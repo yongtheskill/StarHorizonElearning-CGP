@@ -3,6 +3,8 @@
   <head>
 
     {% load static %}
+    {% block cssb %}
+    {% endblock %}
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Raleway:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="{% static "css/materialize.min.css" %}"  media="screen,projection"/>
@@ -10,15 +12,9 @@
     <link type="text/css" rel="stylesheet" href="{% static "css/notifications.css" %}"/>
     {% block css %}
     {% endblock %}
-    <style>
-.dropdown-content {
-    transform: none !important;
-}
-    </style>
     <title>{% block title %}{% endblock %}</title>
     <link rel="shortcut icon" type="image/x-icon" href="{% static "img/favicon.svg" %}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
   </head>
   <style>
     * {
@@ -45,6 +41,7 @@
       <li><a href="/live/">Live Streaming</a></li>
       <li><a href="/videoLessons/manage/">Video Lessons</a></li>
       <li><a href="/fileUploads/manage/">File Uploads</a></li>
+      <li><a href="/lessons/manage/">Lessons</a></li>
       <li class="no-padding">
         <ul class="collapsible collapsible-accordion">
           <li>
@@ -79,7 +76,7 @@
       <li><a href='/login/'>Login</a></li>
       {% endif %}
     
-      <a href="https://www.cgp-personnel.sg/" style="padding-bottom: 25px;" class="logo-container"><img class="brand-logo" src="{% static "img/cgpLogo.png" %}" alt="Gotutor Logo"></a>
+      <a href="https://www.cgp-personnel.sg/" style="padding-bottom: 25px; width: 100%; display: flex; justify-content: center;" class="logo-container" ><img class="brand-logo" style="padding-right: 10px" src="{% static "img/cgpLogo.png" %}" alt="Gotutor Logo"></a>
     </ul>
     
     <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons" style="font-size: xx-large; padding-left: 15px; padding-top: 10px;">menu</i></a>
@@ -112,6 +109,7 @@
               <li><a href="/live/">Live Streaming</a></li>
               <li><a href="/videoLessons/manage/">Video Lessons</a></li>
               <li><a href="/fileUploads/manage/">File Uploads</a></li>
+              <li><a href="/lessons/manage/">Lessons</a></li>
               <li><a class="dropdown-trigger" href="#!" data-target="dropdown1">Quiz<i class="material-icons right">arrow_drop_down</i></a></li>
 
               
@@ -156,6 +154,7 @@
           <li><a href="/live/">Live Streaming</a></li>
           <li><a href="/videoLessons/manage/">Video Lessons</a></li>
           <li><a href="/fileUploads/manage/">File Uploads</a></li>
+          <li><a href="/lessons/manage/">Lessons</a></li>
           <li><a href="/quizzes/manage/">Quizzes</a></li>
           {% endif %}
 

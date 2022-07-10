@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% load static %}<br />
+{% block title %}Create Quiz{% endblock %} {% block css %} {% endblock %} {% block content %}
+<a class="waves-effect waves-black btn-flat" href="/quizzes/manage"
+  ><i class="material-icons left" style="margin-right: 0px">arrow_back_ios</i>Back</a
+>
+
+<h2 class="center-align">Create Quiz</h2>
+
+<form method="POST" id="createQuizForm">
+  {% csrf_token %}
+  <div class="row" style="display: flex; align-items: center">
+    <div class="input-field col s12 m10">
+      <i class="material-icons text-accent-1 prefix">mode_edit</i>
+      <input class="black-text" type="text" name="quizName" id="id_quizName" autofocus required />
+      <label class="black-text" for="id_quizName">Quiz Name</label>
+    </div>
+
+    <div class="col s12 m2" style="display: flex; justify-content: flex-end">
+      <button class="btn accent-1" type="submit" name="action">Create</button>
+    </div>
+  </div>
+</form>
+
+{% endblock %} {% block javascript %} {% endblock %}

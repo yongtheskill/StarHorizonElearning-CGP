@@ -9,9 +9,9 @@ class Notification(models.Model):
 
     title = models.CharField(max_length=200, verbose_name="title")
     content = models.CharField(max_length=999999999, verbose_name="content")
-    
-    start = models.DateTimeField(default=datetime.datetime.now())
-    end = models.DateTimeField(default=datetime.datetime.now())
+
+    start = models.DateTimeField(auto_now_add=True)
+    end = models.DateTimeField(auto_now_add=True)
 
     studentClasses = models.ManyToManyField(StudentClass)
 

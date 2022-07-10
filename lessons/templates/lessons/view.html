@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% load static %} {% block title %}View Lesson{% endblock %}
+<!---->
+{% block css %}<style>
+  .customContainer {
+    margin: 0 auto;
+    width: 95%;
+  }
+</style>
+<!---->
+{% endblock %} {% block content %}
+<div class="customContainer" style="padding-bottom: 15px">
+  <a class="waves-effect waves-black btn-flat" onclick="window.history.back();"
+    ><i class="material-icons left" style="margin-right: 0px">arrow_back_ios</i>Back</a
+  >
+</div>
+<div class="progress" id="preloader">
+  <div class="indeterminate" style="background-color: #ed1d24"></div>
+</div>
+<iframe
+  src="{{lesson.uploadedFile.url}}"
+  onload='javascript:(function(o){o.style.height=o.contentWindow.document.body.scrollHeight+"px";}(this));'
+  style="height: 80vh; width: 100%; border: none; overflow: hidden"
+  id="lessonFrame"
+></iframe>
+<!---->{% endblock %} {% block javascript %}
+<script>
+  window.onload = function () {
+    $('#preloader').css('display', 'none');
+  };
+</script>
+{% endblock %}

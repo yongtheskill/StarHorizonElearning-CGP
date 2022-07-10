@@ -1,87 +1,78 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Class List View{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Class List View{% endblock %}
+<!---->{% block content %}
 
 <h3 class="center-align">Your classes</h3>
-<br>
+<br />
 
 <table class="striped responsive-table">
-    <thead>
-        <th>Class</th>
-        <th>Institution</th>
-    </thead>
+  <thead>
+    <th>Class</th>
+    <th>Institution</th>
+  </thead>
 
-    <tbody>
-        {% for i in classes %}
-        <tr>
-            <td>
-                <a href="/class/{{i.id}}/accounts">{{ i.className }}</a>
-            </td>
-            <td>{{ i.classInstitution }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <tbody>
+    {% for i in classes %}
+    <tr>
+      <td>
+        <a href="/class/{{i.id}}/accounts">{{ i.className }}</a>
+      </td>
+      <td>{{ i.classInstitution }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
-
 
 {% if user.accountType == 'Teacher' %}
 <!-- add button -->
 <div class="addBtn">
-    <a class="btn-floating btn-large accent-1" href="/classes/create">
-        <i class="large material-icons">note_add</i>
-    </a>
+  <a class="btn-floating btn-large accent-1" href="/classes/create">
+    <i class="large material-icons">note_add</i>
+  </a>
 </div>
 {% endif %}
 
-<br><br>
+<br /><br />
 
 {% if outstandingQuizzes or outstandingLivelessons%}
 <h3 class="center-align">Today's activities</h3>
-<br>
-{% endif %}
-
-{% if outstandingQuizzes %}
+<br />
+{% endif %} {% if outstandingQuizzes %}
 <table>
-    <thead>
-        <th>Quizzes Due</th>
-        <th>Deadline</th>
-    </thead>
+  <thead>
+    <th>Quizzes Due</th>
+    <th>Deadline</th>
+  </thead>
 
-    <tbody>
-        {% for i in outstandingQuizzes %}
-        <tr>
-            <td>
-                <a href="/quizzes/do/{{ i.quizID }}">{{ i.quizName }}</a>
-            </td>
-            <td>{{ i.quizDueDate }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <tbody>
+    {% for i in outstandingQuizzes %}
+    <tr>
+      <td>
+        <a href="/quizzes/{{ i.quizID }}/do/">{{ i.quizName }}</a>
+      </td>
+      <td>{{ i.quizDueDate }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {% endif %}
 
-<br><br>
+<br /><br />
 {% if outstandingLivelessons %}
 <table>
-    <thead>
-        <th>Live Lessons</th>
-        <th>Time</th>
-    </thead>
+  <thead>
+    <th>Live Lessons</th>
+    <th>Time</th>
+  </thead>
 
-    <tbody>
-        {% for i in outstandingLivelessons %}
-        <tr>
-            <td>
-                <a href="/live/join/{{ i.streamID }}">{{ i.lessonName }}</a>
-            </td>
-            <td>{{ i.streamTime }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <tbody>
+    {% for i in outstandingLivelessons %}
+    <tr>
+      <td>
+        <a href="/live/join/{{ i.streamID }}">{{ i.lessonName }}</a>
+      </td>
+      <td>{{ i.streamTime }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
-{% endif %}
-
-{% endblock %}
+{% endif %} {% endblock %}

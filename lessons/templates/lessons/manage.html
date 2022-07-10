@@ -1,0 +1,63 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Manage Lessons{% endblock %}
+<!---->
+{% block css %}
+<style>
+  /* list styling */
+  ul.collection {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  th,
+  td {
+    text-align: center;
+  }
+
+  /* Add Button */
+  .addQuizBtn {
+    float: right;
+    padding-top: 20px;
+  }
+</style>
+{% endblock %} {% block content %}
+
+<h2 class="center-align">Manage Lessons</h2>
+
+<div id="all" class="col s12">
+  <table style="margin-top: 10px">
+    <thead>
+      <tr>
+        <th>Lesson Name</th>
+        <th>Lesson ID</th>
+        <th>View Lesson</th>
+        <th>Delete Lesson</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for i in lessonObjects %}
+      <tr>
+        <td>{{ i.name }}</td>
+        <td>{{ i.fileID }}</td>
+        <td>
+          <a href="/lessons/view/{{ i.fileID }}"
+            ><i class="material-icons text-accent-1">visibility</i></a
+          >
+        </td>
+        <td>
+          <a href="/lessons/delete/{{ i.fileID }}"><i class="material-icons red-text">delete</i></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- add button -->
+<div class="addQuizBtn">
+  <a class="btn-floating btn-large accent-1" href="../create">
+    <i class="large material-icons">note_add</i>
+  </a>
+</div>
+
+{% endblock %} {% block javascript %} {% endblock %}

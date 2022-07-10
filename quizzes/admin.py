@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from django.utils.html import format_html
 
-from .models import Quiz, Question
+from .models import Quiz
 
 # Register your models here.
 
@@ -18,6 +18,4 @@ class QuizAdmin(admin.ModelAdmin):
         return super().__str__()
 
 
-
 admin.site.register(Quiz, QuizAdmin)
-admin.site.register(Question)

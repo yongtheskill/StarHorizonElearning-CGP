@@ -18,8 +18,6 @@ class Course(models.Model):
     courseCode = models.CharField(
         max_length=200, verbose_name="course code", null=True)
 
-    quizTags = models.CharField(max_length=5000)
-
     def setTags(self, x):
         self.quizTags = json.dumps(x)
 
@@ -28,6 +26,9 @@ class Course(models.Model):
 
     def __str__(self):
         return self.courseName
+
+    def toDict(self):
+        return {"name": self.courseName, "id": self.id}
 
 
 class StudentClass(models.Model):
@@ -51,6 +52,9 @@ class Module(models.Model):
 
     def __str__(self):
         return self.moduleName
+
+    def toDict(self):
+        return {"name": self.moduleName, "id": self.id, "courseId": self.course.id}
 
 
 class User(AbstractUser):
@@ -84,6 +88,9 @@ class User(AbstractUser):
         default=False, verbose_name="Notification Access", help_text="Designates whether the user can send notifications")
 
     notificationsSeen = models.ManyToManyField("notifications.Notification")
+
+    pwResetCode = models.CharField(max_length=256, default="none")
+    pwResetTime = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.username

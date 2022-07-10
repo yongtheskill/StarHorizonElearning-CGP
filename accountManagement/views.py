@@ -1,17 +1,25 @@
 import re
 import json
+from time import sleep
 import humanize
+import string
+import random
 from datetime import date, datetime, timedelta
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
+from lessons.models import Lesson
 
 from .models import User, Course, StudentClass, Module
 from quizzes.models import Quiz
 from videoLessons.models import Video
-from quizzes.models import Quiz
+from quizzes.models import Quiz, QuizAttempt
 from fileUploads.models import FileUpload
 from liveLesson.models import LiveLesson
 
@@ -137,33 +145,16 @@ def classView(request, classId):
     quizzes = []
     for i in modules:
         quizzes += list(Quiz.objects.filter(module=i))
-    quizNames = [i.quizName for i in quizzes]
-    quizCounts = {i: 0 for i in quizNames}
-    quizCountsPass = {i: 0 for i in quizNames}
 
-    for user in students:
-        quizResponseJSON = user.quizResponses
-        if quizResponseJSON and "__________RESPONSESPLITTER__________" in quizResponseJSON:
-            allQuizResponses = quizResponseJSON.split(
-                "__________RESPONSESPLITTER__________")[1:]
-            for i in allQuizResponses:
-                quizName = ""
-                try:
-                    quizName = json.loads(i)[0]["quizName"]
-                    quizCounts[quizName] += 1
-                    if json.loads(i)[0]["isPassed"]:
-                        quizCountsPass[quizName] += 1
-                except:
-                    pass
-
+    print(quizzes)
     quizData = []
-    for i in quizCounts:
-        try:
-            quizData.append((i, str(quizCounts[i]), str(
-                quizCountsPass[i]), Quiz.objects.filter(quizName=i)[0].quizID))
-        except:
-            quizData.append(
-                (i, str(quizCounts[i]), "0", Quiz.objects.filter(quizName=i)[0].quizID))
+    for quiz in quizzes:
+        quizData.append({
+            "name": quiz.quizName,
+            "completed": len(list(QuizAttempt.objects.filter(quiz__quizID=quiz.quizID))),
+            "passed": len([i for i in list(QuizAttempt.objects.filter(quiz__quizID=quiz.quizID)) if i.score >= quiz.passingScore]),
+            "id": quiz.quizID
+        })
 
     context = {"class": studentClass, "teachers": teachers, "students": students, "courses": courses,
                "liveLessonsNew": liveLessonsNew, "liveLessonsOld": liveLessonsOld, "quizData": quizData, "nStudents": len(students), }
@@ -218,6 +209,14 @@ def courseView(request, courseId):
         module.fileUploadsAll.extend(
             [{"file": f, "new": False} for f in fileUploadsOld])
         module.fileUploadsAll.sort(key=lambda x: x["file"].fileID)
+
+        lessonsNew, lessonsOld = newnessChecker(
+            list(Lesson.objects.filter(module=module)))
+        module.lessonsAll = [{"lesson": l, "new": True}
+                             for l in lessonsNew]
+        module.lessonsAll.extend(
+            [{"lesson": l, "new": False} for l in lessonsOld])
+        module.lessonsAll.sort(key=lambda x: x["lesson"].fileID)
 
     context = {"course": course, "ownClasses": ownClasses,
                "otherClasses": otherClasses, "modules": modules, }
@@ -488,3 +487,76 @@ def createModule(request, courseId):
 
     else:
         return render(request, 'accountManagement/createModule.html', {})
+
+
+def forgotPassword(request):
+
+    if request.method == 'POST':
+        try:
+            user = User.objects.get(username=request.POST["username"])
+        except:
+            sleep(1+random.random()*2)
+            return render(request, 'accountManagement/resetNotification.html', {"mainText": "Please check your email to reset your password.", "secText": "The email will only be sent if an account corresponding to your username exists."})
+
+        user.pwResetCode = ''.join(random.choice(
+            string.ascii_letters) for i in range(64))
+
+        user.pwResetTime = sgt.localize(
+            datetime.now()) + timedelta(minutes=15)
+
+        user.save()
+
+        resetUrl = f'http://cgpsdotraining.com/pwr/{user.pwResetCode}'
+
+        html_message = render_to_string('accountManagement/pwreset.html', {
+                                        'firstName': user.first_name, 'lastName': user.last_name, 'resetUrl': resetUrl})
+        plain_message = f'''Hi {user.first_name} {user.last_name},
+
+You requested a password reset for the CGPSDOTRAINING website.
+Please click on the following link to reset your password.
+{resetUrl}
+Note: the link will expire in 15 minutes.
+
+Thank you.'''
+
+        send_mail(
+            'Password Reset - CGP SDO Training',
+            plain_message,
+            'CGP SDO Training <noreply@cgpsdotraining.com>',
+            [user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+
+        return render(request, 'accountManagement/resetNotification.html', {"mainText": "Please check your email to reset your password.", "secText": "The email will only be sent if an account corresponding to your username exists."})
+
+    else:
+        return render(request, 'accountManagement/forgotPassword.html')
+
+
+def forgotPasswordReset(request, passwordCode):
+    try:
+        user = User.objects.get(pwResetCode=passwordCode)
+    except:
+        return render(request, 'accountManagement/resetNotification.html', {"mainText": "Password reset link is invalid."})
+
+    if sgt.localize(datetime.now()) > user.pwResetTime:
+        return render(request, 'accountManagement/resetNotification.html', {"mainText": "Password reset link has expired."})
+
+    if request.method == 'POST':
+
+        form = SetPasswordForm(user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(
+                request, 'Your password was successfully updated!')
+            user.pwResetTime = user.pwResetTime - timedelta(hours=1)
+            user.save()
+            return render(request, 'accountManagement/resetNotification.html', {"mainText": "Password successfully reset."})
+        else:
+            messages.error(request, 'Password does not meet requirements.')
+    else:
+        list(messages.get_messages(request))
+        form = PasswordChangeForm(user)
+    return render(request, 'accountManagement/passwordReset.html', {'form': form})

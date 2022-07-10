@@ -32,11 +32,16 @@ AWS_QUERYSTRING_EXPIRE = '18000'
 LIVE_EC2_ID = 'i-0affe9ef2d03a04df'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 SECURE_SSL_REDIRECT = False
+
+EMAIL_BACKEND = 'django_ses.SESBackend'
+AWS_SES_REGION_NAME = 'ap-southeast-1'
 
 # Application definition
 
@@ -47,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 
     'home.apps.HomeConfig',
     'accountManagement.apps.AccountmanagementConfig',
@@ -55,15 +61,17 @@ INSTALLED_APPS = [
     'fileUploads.apps.FileuploadsConfig',
     'liveLesson.apps.LivelessonConfig',
     'notifications.apps.NotificationsConfig',
+    'lessons.apps.LessonsConfig',
 
     'storages',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

@@ -1,0 +1,145 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Manage Quizzes{% endblock %}
+<!---->{% block css %}
+<style>
+  /* list styling */
+  ul.collection {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  th,
+  td {
+    text-align: center;
+  }
+
+  /* Add Button */
+  .addQuizBtn {
+    float: right;
+    padding-top: 20px;
+    padding-bottom: 50px;
+  }
+
+  .actionCell > a {
+    margin: 0 0.4rem;
+  }
+
+  .modal {
+    border-radius: 1rem;
+  }
+</style>
+{% endblock %} {% block content %}
+
+<h2 class="center-align">Manage Quizzes</h2>
+
+<div id="all" class="col s12">
+  <table style="margin-top: 10px">
+    <thead>
+      <tr>
+        <th>Quiz Name</th>
+        <th>ID</th>
+        <th>Actions</th>
+        <!--
+              <th>Repeat</th>
+              <th>Download</th>
+              <th>Delete</th>
+              -->
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for i in quizObjects %}
+      <tr>
+        <td>{{ i.quizName }}</td>
+        <td>{{ i.quizID }}</td>
+        <td class="actionCell">
+          <a href="/quizzes/{{ i.quizID }}/edit">
+            <i
+              class="material-icons tooltipped text-accent-1"
+              data-position="top"
+              data-tooltip="Edit"
+              >edit</i
+            >
+          </a>
+          <a class="modal-trigger" href="#duplicateModal{{ i.quizID }}">
+            <i
+              class="material-icons tooltipped text-accent-1"
+              data-position="top"
+              data-tooltip="Duplicate"
+              >content_copy</i
+            >
+          </a>
+          <a class="modal-trigger" href="/quizzes/download/?id={{ i.quizID }}">
+            <i
+              class="material-icons tooltipped text-accent-1"
+              data-position="top"
+              data-tooltip="Download"
+              >download</i
+            >
+          </a>
+          <a class="modal-trigger" href="#deleteModal{{ i.quizID }}">
+            <i
+              class="material-icons tooltipped text-accent-1"
+              data-position="top"
+              data-tooltip="Delete"
+              >delete</i
+            >
+          </a>
+        </td>
+        <!--
+                {% if i.isDue %}<td><a href="/quizzes/{{ i.quizID }}/repeat"><i class="material-icons text-accent-1">replay</i></td>{% else %}<td><i class="material-icons tooltipped" data-position="left" data-tooltip="Repeat not available" style="color: #CCCCCC;">replay</i></td>{% endif %}
+                <td><a href="/quizzes/download/?id={{ i.quizID }}"><i class="material-icons text-accent-1">download</i></a></td>
+                <td><a href="/quizzes/{{ i.quizID }}/view"><i class="material-icons text-accent-1">visibility</i></a></td>
+                -->
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- add button -->
+<div class="addQuizBtn">
+  <a class="btn-floating btn-large accent-1" href="/quizzes/create">
+    <i class="large material-icons">note_add</i>
+  </a>
+</div>
+
+{% for i in quizObjects %}
+<div id="deleteModal{{ i.quizID }}" class="modal">
+  <div class="modal-content">
+    <h4>Delete {{ i.quizName }}?</h4>
+    <p>After a quiz is deleted, it cannot be recovered.</p>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class="modal-close waves-effect btn-flat">Cancel</a>
+    <a
+      href="/quizzes/{{ i.quizID }}/delete/"
+      class="waves-effect btn-flat red-text"
+      style="font-weight: 700"
+      >Delete</a
+    >
+  </div>
+</div>
+
+<div id="duplicateModal{{ i.quizID }}" class="modal">
+  <div class="modal-content">
+    <h4>Duplicate {{ i.quizName }}?</h4>
+    <p>Create an exact copy of the quiz that can be modified independently.</p>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class="modal-close waves-effect btn-flat">Cancel</a>
+    <a
+      href="/quizzes/{{ i.quizID }}/duplicate/"
+      class="waves-effect btn-flat red-text"
+      style="font-weight: 700"
+      >Confirm</a
+    >
+  </div>
+</div>
+{% endfor %} {% endblock %} {% block javascript %}
+<script>
+  $(document).ready(function () {
+    $('.tooltipped').tooltip();
+    $('.modal').modal();
+  });
+</script>
+{% endblock %}

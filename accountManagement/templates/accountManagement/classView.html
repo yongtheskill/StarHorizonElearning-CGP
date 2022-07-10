@@ -187,12 +187,12 @@
     </thead>
 
     <tbody>
-        {% for quizDataRow in quizData %}
+        {% for quiz in quizData %}
         <tr>
-            <td style="text-align: left;">{{ quizDataRow.0 }}</td>
-            <td>{{ quizDataRow.1 }}/{{ nStudents }}</td>
-            <td>{{ quizDataRow.2 }}/{{ nStudents }}</td>
-            <td><a href="/quizzes/download/?id={{ quizDataRow.3 }}"><i class="material-icons text-accent-1">download</i></a></td>
+            <td style="text-align: left;">{{ quiz.name }}</td>
+            <td>{{ quiz.completed }}/{{ nStudents }}</td>
+            <td>{{ quiz.passed }}/{{ nStudents }}</td>
+            <td><a href="/quizzes/download/?id={{ quiz.id }}"><i class="material-icons text-accent-1">download</i></a></td>
         </tr>
         {% endfor %}
     </tbody>
