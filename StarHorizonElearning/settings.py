@@ -32,7 +32,7 @@ AWS_QUERYSTRING_EXPIRE = '18000'
 LIVE_EC2_ID = 'i-0affe9ef2d03a04df'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
