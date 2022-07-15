@@ -1,74 +1,68 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Manage Files{% endblock %}
-
-
-{% block css %}    
+{% extends 'base.html' %} {% load static %} {% block title %}Manage Files{% endblock %}
+<!---->
+{% block css %}
 <style>
-/* list styling */
-ul.collection {
+  /* list styling */
+  ul.collection {
     border-top: none;
     border-left: none;
     border-right: none;
-}
-th, td {
+  }
+  th,
+  td {
     text-align: center;
-}
+  }
 
-/* Add Button */
-.addQuizBtn {
-  float: right;
-  padding-top: 20px;
-}
+  /* Add Button */
+  .addQuizBtn {
+    float: right;
+    padding-top: 20px;
+  }
 </style>
-{% endblock %}
-
-
-
-{% block content %}
-
+{% endblock %} {% block content %}
 
 <h2 class="center-align">Manage File Uploads</h2>
 
-
 <div id="all" class="col s12">
-    <table style="margin-top: 10px;">
-        <thead>
-          <tr>
-              <th>File Name</th>
-              <th>file ID</th>
-              <th>Download File</th>
-              <th>Delete File</th>
-          </tr>
-        </thead>
+  <table style="margin-top: 10px">
+    <thead>
+      <tr>
+        <th>File Name</th>
+        <th>file ID</th>
+        <th>Download File</th>
+        <th>Delete File</th>
+      </tr>
+    </thead>
 
-        <tbody>
-            {% for i in fileObjects %}
-            <tr>
-                <td>{{ i.fileName }}</td>
-                <td>{{ i.fileID }}</td>
-                <td><a href="{{ i.uploadedFile.url }}" target="_blank"><i class="material-icons text-accent-1">get_app</i></a></td>
-                <td><a href="/fileUploads/delete/{{ i.fileID }}"><i class="material-icons red-text">delete</i></a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <tbody>
+      {% for i in fileObjects %}
+      <tr>
+        <td>{{ i.fileName }}</td>
+        <td>{{ i.fileID }}</td>
+        <td>
+          <a href="{{ i.uploadedFile.url }}" target="_blank"
+            ><i class="material-icons text-accent-1">get_app</i></a
+          >
+        </td>
+        <td>
+          <a href="/fileUploads/delete/{{ i.fileID }}"
+            ><i class="material-icons red-text">delete</i></a
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 <!-- add button -->
-<div class="addQuizBtn">
-    <a class="btn-floating btn-large accent-1" href="../upload">
-        <i class="large material-icons">note_add</i>
-    </a>
+<div
+  class="addQuizBtn"
+  style="position: sticky; bottom: 20px; margin-top: 20px; margin-bottom: 80px"
+>
+  <a class="btn-floating btn-large accent-1" href="../upload">
+    <i class="large material-icons">note_add</i>
+  </a>
 </div>
 
-{% endblock %}
-
-
-
-
-{% block javascript %}
-
-
-{% endblock %}
+{% endblock %} {% block javascript %} {% endblock %}
