@@ -97,7 +97,7 @@ def deleteLesson(request, lessonID):
         fileToDelete.uploadedFile.delete()
         fileToDelete.delete()
 
-        context = {"fileObjects": Lesson.objects.all,
+        context = {"lessonObjects": Lesson.objects.all,
                    "notification": "File successfully deleted!", }
         return render(request, 'lessons/manage.html', context)
 

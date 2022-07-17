@@ -1,6 +1,15 @@
 {% extends 'base.html' %} {% load static %} {% block title %}Create Lesson{% endblock %}
 <!-- -->{% block css %} <link type="text/css" rel="stylesheet" href="{% static "css/quizzes.css" %}"
-/> {% endblock %} {% block content %}
+/>
+<style>
+  .tutimg {
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-bottom: 15px;
+  }
+</style>
+<!---->
+{% endblock %} {% block content %}
 <a class="waves-effect waves-black btn-flat" onclick="window.history.back();"
   ><i class="material-icons left" style="margin-right: 0px">arrow_back_ios</i>Back</a
 >
@@ -70,15 +79,18 @@
       </div>
       <div class="row">
         <div class="col s12 m6">
-          <div class="file-field input-field">
+          <div class="file-field input-field" style="margin-bottom: 0">
             <div class="btn accent-1">
               <span>Upload File</span>
-              <input name="uploadedFile" type="file" accept=".html" class="validate" required />
+              <input name="uploadedFile" type="file" accept=".zip" class="validate" required />
             </div>
             <div class="file-path-wrapper">
               <input class="file-path validate" name="fileName" type="text" required />
             </div>
           </div>
+          <h6 style="margin-top: 0; margin-bottom: 1rem; margin-left: 5px">
+            <a href="#" onclick="openInfo()">Help ⚠</a>
+          </h6>
         </div>
       </div>
 
@@ -92,7 +104,77 @@
   </div>
 </div>
 
+<div
+  style="
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    background-color: #000a;
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: none;
+  "
+  id="infoContainer"
+  onclick="closeInfo()"
+>
+  <div
+    class="container"
+    style="display: flex; align-items: center; justify-content: center; height: 100%"
+  >
+    <div
+      style="width: 100%; height: max-content; background-color: #fff; border-radius: 10px"
+      onclick="stopProp(event)"
+    >
+      <div style="padding: 1.94667rem 40px 20px 40px">
+        <div style="max-height: 60vh; overflow-y: auto">
+          <h3 style="margin-top: 0">How to create h5p lesson</h3>
+          <h5>1. Open h5p file in lumi</h5>
+          <h5>2. Under file, click "Export..."</h5>
+          <img class="responsive-img tutimg" src="{% static "img/h5ptut/2.png" %}">
+          <h5>3. Select "One HTML file and several media files"</h5>
+          <img class="responsive-img tutimg" src="{% static "img/h5ptut/3.png" %}">
+          <h5>4. Select only "Show rights and permissions"</h5>
+          <img class="responsive-img tutimg" src="{% static "img/h5ptut/4.png" %}">
+          <h5>5. Select "Add CSS file" under "Display options", and choose <a href="{% static "img/h5ptut/h5p.css" %}" download>this</a> file</h5>
+          <img class="responsive-img tutimg" src="{% static "img/h5ptut/5.png" %}">
+          <h5>6. Click "EXPORT NOW"</h5>
+          <h5>7. Create an empty folder, and set the file name to be index.html, then click "Export"</h5>
+          <img class="responsive-img tutimg" src="{% static "img/h5ptut/7.png" %}">
+          <h5>8. Open the folder, select everything, right click, and select "Compressed (zipped) folder"</h5>
+          <img class="responsive-img tutimg" src="{% static "img/h5ptut/8.png" %}">
+          <h5>8. Upload the resulting zip file here</h5>
+
+        </div>
+        <div style="width: 100%; display: flex; justify-content: flex-end">
+          <a
+            class="waves-effect waves-light btn"
+            style="background-color: #db3833; margin-top: 20px"
+            onclick="closeInfo()"
+            >Close</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %} {% block javascript %}
+
+<script>
+  const openInfo = () => {
+    $('#infoContainer').css('display', 'block');
+  };
+  const closeInfo = () => {
+    $('#infoContainer').css('display', 'none');
+  };
+  const stopProp = (event) => {
+    event.stopPropagation();
+  };
+</script>
+
 <script>
 
   $( document ).ready(function() {
