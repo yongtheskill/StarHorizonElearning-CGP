@@ -18,4 +18,14 @@ class QuizAdmin(admin.ModelAdmin):
         return super().__str__()
 
 
+class AttemptAdmin(admin.ModelAdmin):
+    list_display = list(admin.ModelAdmin.list_display)
+    list_display.append("quiz")
+    list_display.append("student")
+    list_display.append("score")
+
+    def __str__(self):
+        return super().__str__()
+
+
 admin.site.register(Quiz, QuizAdmin)

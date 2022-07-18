@@ -186,6 +186,9 @@ class QuizAttempt(models.Model):
             "questionAttempts": [i.toDict() for i in self.questionAttempts.all()],
         }
 
+    def __str__(self):
+        return f"{self.quiz.name}: {self.student.username}"
+
 
 class QuestionAttempt(models.Model):
     question = models.ForeignKey(
