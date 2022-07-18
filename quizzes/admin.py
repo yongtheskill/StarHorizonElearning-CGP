@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from django.utils.html import format_html
 
-from .models import Quiz
+from .models import Quiz, QuizAttempt
 
 # Register your models here.
 
@@ -29,3 +29,4 @@ class AttemptAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Quiz, QuizAdmin)
+admin.site.register(QuizAttempt, AttemptAdmin)
