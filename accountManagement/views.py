@@ -291,7 +291,7 @@ def individualAccountView(request, userId):
     user = User.objects.get(id=userId)
 
     if request.method == "POST":
-        user.quizResponses = ""
+        user.attempts.all().delete()
         user.save()
 
     classes = list(user.classes.all())
