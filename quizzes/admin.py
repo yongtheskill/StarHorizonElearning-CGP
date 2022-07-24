@@ -13,6 +13,9 @@ class QuizAdmin(admin.ModelAdmin):
     list_display = list(admin.ModelAdmin.list_display)
     list_display.append("download_link")
 
+    fields = ('quizName', 'quizDueDate', 'passingScore', 'module')
+    readonly_fields = ('quizID')
+
     def download_link(self, obj):
         return format_html("<a href='/quizzes/dl/?id={id}'>Download</a>", id=obj.quizID)
 
