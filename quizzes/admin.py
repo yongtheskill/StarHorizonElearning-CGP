@@ -1,12 +1,14 @@
+
 from django.contrib import admin
 
 from django.utils.html import format_html
 
-from .models import Quiz, QuizAttempt
+from .models import Question, QuestionAttempt, QuestionTag, Quiz, QuizAttempt
 
 # Register your models here.
 
 
+@admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):
     list_display = list(admin.ModelAdmin.list_display)
     list_display.append("download_link")
@@ -18,7 +20,8 @@ class QuizAdmin(admin.ModelAdmin):
         return super().__str__()
 
 
-class AttemptAdmin(admin.ModelAdmin):
+@admin.register(QuizAttempt)
+class QuizAttemptAdmin(admin.ModelAdmin):
     list_display = list(admin.ModelAdmin.list_display)
     list_display.append("quiz")
     list_display.append("student")
@@ -28,5 +31,6 @@ class AttemptAdmin(admin.ModelAdmin):
         return super().__str__()
 
 
-admin.site.register(Quiz, QuizAdmin)
-admin.site.register(QuizAttempt, AttemptAdmin)
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    pass

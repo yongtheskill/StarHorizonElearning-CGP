@@ -32,7 +32,7 @@ AWS_QUERYSTRING_EXPIRE = '18000'
 LIVE_EC2_ID = 'i-0affe9ef2d03a04df'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -57,11 +57,11 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'accountManagement.apps.AccountmanagementConfig',
     'videoLessons.apps.VideolessonsConfig',
-    'quizzes.apps.QuizzesConfig',
     'fileUploads.apps.FileuploadsConfig',
     'liveLesson.apps.LivelessonConfig',
     'notifications.apps.NotificationsConfig',
     'lessons.apps.LessonsConfig',
+    'quizzes.apps.QuizzesConfig',
 
     'storages',
 ]
@@ -166,3 +166,5 @@ MEDIA_URL = "https://%s.s3.amazonaws.com/media/" % (AWS_STORAGE_BUCKET_NAME)
 
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

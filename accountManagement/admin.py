@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django import forms
 
@@ -51,7 +50,7 @@ class StudentAdminForm(forms.ModelForm):
         queryset=User.objects.all(),
         required=False,
         widget=FilteredSelectMultiple(
-            verbose_name=_('Users'),
+            verbose_name='Users',
             is_stacked=False
         )
     )
