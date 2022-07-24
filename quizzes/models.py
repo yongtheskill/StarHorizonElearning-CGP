@@ -213,7 +213,7 @@ class QuestionAttempt(models.Model):
     saAnswer = models.CharField(max_length=999999, default="")
     mcAnswer = models.IntegerField(default=-1)
     cbAnswer = models.CharField(max_length=999, default="[]")
-    isCorrect = models.BooleanField(default=False)
+    isCorrect = models.BooleanField(default=False, verbose_name="Is Correct")
 
     def toDict(self):
         return {
