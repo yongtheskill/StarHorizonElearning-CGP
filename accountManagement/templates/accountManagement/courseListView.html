@@ -11,7 +11,7 @@
 <br />
 
 {% for i in courses %}
-<table class="striped responsive-table">
+<table class="striped responsive-table" style="margin-bottom: 3rem">
   <caption class="left-align">
     <h5><a href="/course/{{ i.id }}/accounts">{{ i.courseName }}</a></h5>
   </caption>
@@ -33,6 +33,7 @@
     </tr>
     {% endfor %}
   </tbody>
+  {% if user.accountType == 'Teacher' %}
   <thead>
     <th style="padding-top: 25px">Quiz Tags</th>
   </thead>
@@ -73,8 +74,11 @@
     </div>
     {% endfor %}
   </tbody>
+  {% endif %}
 </table>
+{% if user.accountType == 'Teacher' %}
 <a class="wave-effect btn-flat modal-trigger blue-text" href="#addTagModal{{ i.id }}">Add Tag</a>
+{% endif %}
 
 <div id="addTagModal{{ i.id }}" class="modal">
   <form id="addTagForm{{i.id}}" action="/quizzes/createTag/{{i.id}}/" method="post">

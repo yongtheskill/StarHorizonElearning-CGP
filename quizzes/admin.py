@@ -20,6 +20,14 @@ class QuizAdmin(admin.ModelAdmin):
         return super().__str__()
 
 
+class QuestionAttemptInline(admin.TabularInline):
+    fields = ('question', 'type', 'isCorrect')
+    model = QuestionAttempt
+    readonly_fields = ('question', 'type')
+    exclude = ('saAnswer', 'mcAnswer', 'cbAnswer')
+    can_delete = False
+
+
 @admin.register(QuizAttempt)
 class QuizAttemptAdmin(admin.ModelAdmin):
     list_display = list(admin.ModelAdmin.list_display)
@@ -27,10 +35,7 @@ class QuizAttemptAdmin(admin.ModelAdmin):
     list_display.append("student")
     list_display.append("score")
 
+    inlines = [QuestionAttemptInline]
+
     def __str__(self):
         return super().__str__()
-
-
-@admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
-    pass

@@ -146,13 +146,12 @@ def classView(request, classId):
     for i in modules:
         quizzes += list(Quiz.objects.filter(module=i))
 
-    print(quizzes)
     quizData = []
     for quiz in quizzes:
         quizData.append({
             "name": quiz.quizName,
-            "completed": len(list(QuizAttempt.objects.filter(quiz__quizID=quiz.quizID))),
-            "passed": len([i for i in list(QuizAttempt.objects.filter(quiz__quizID=quiz.quizID)) if i.score >= quiz.passingScore]),
+            "completed": len([i for i in QuizAttempt.objects.filter(quiz__quizID=quiz.quizID) if i.student.classes.filter(id=classId).exists()]),
+            "passed": len([i for i in list(QuizAttempt.objects.filter(quiz__quizID=quiz.quizID)) if i.score >= quiz.passingScore and i.student.classes.filter(id=classId).exists()]),
             "id": quiz.quizID
         })
 
@@ -302,25 +301,10 @@ def individualAccountView(request, userId):
     else:
         timeOnline = "0 minutes"
 
-    quizResponseJSON = user.quizResponses
-    if quizResponseJSON and "__________RESPONSESPLITTER__________" in quizResponseJSON:
-        allQuizResponses = quizResponseJSON.split(
-            "__________RESPONSESPLITTER__________")[1:]
+    print(user.attempts.all())
 
-        quizResults = {}
-        passedResults = {}
-        for i in allQuizResponses:
-            fullScore = len(re.findall(r'"isCorrect":', i))
-            score = len(re.findall(r'"isCorrect": true', i))
-
-            quizResults[json.loads(i)[0]["quizName"]] = (
-                "{}/{}".format(score, fullScore), json.loads(i)[0]["isPassed"])
-
-        context = {"tempUser": user, "classes": classes,
-                   "quizResults": quizResults, "timeOnline": timeOnline, }
-    else:
-        context = {"tempUser": user, "classes": classes,
-                   "timeOnline": timeOnline}
+    context = {"tempUser": user, "classes": classes,
+               "timeOnline": timeOnline, "attempts": user.attempts.all()}
 
     return render(request, 'accountManagement/individualAccountView.html', context)
 

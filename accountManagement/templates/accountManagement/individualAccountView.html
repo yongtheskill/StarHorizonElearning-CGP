@@ -1,110 +1,108 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% load misc_tags %}
-
-{% block title %}Individual View{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% load misc_tags %}
+<!---->{% block title %}Individual View{% endblock %} {% block content %}
 
 <h3 class="center-align">{{ tempUser }}</h3>
-<hr><br><br>
+<hr />
+<br /><br />
 
 <h4 class="left-align">Details</h4>
-<hr>
+<hr />
 <table class="striped responsive-table">
+  <tbody>
+    <tr>
+      <td>Username:</td>
+      <td>{{ tempUser.first_name }} {{ tempUser.last_name }}</td>
+    </tr>
+    <tr>
+      <td>Contact:</td>
+      <td>{{ tempUser.email }}</td>
+    </tr>
+    <tr>
+      <td>Start Date:</td>
+      <td>{{ tempUser.startDate|default_if_none:"-" }}</td>
+    </tr>
+    <tr>
+      <td>Designation:</td>
+      <td>{{ tempUser.designation|default_if_none:"-" }}</td>
+    </tr>
+    <tr>
+      <td>Institution:</td>
+      <td>{{ tempUser.institution|default_if_none:"-" }}</td>
+    </tr>
 
-    <tbody>
-        <tr>
-            <td>Username:</td>
-            <td>{{ tempUser.first_name }} {{ tempUser.last_name }}</td>
-        </tr>
-        <tr>
-            <td>Contact:</td>
-            <td>{{ tempUser.email }}</td>
-        </tr>
-        <tr>
-            <td>Start Date:</td>
-            <td>{{ tempUser.startDate|default_if_none:"-" }}</td>
-        </tr>
-        <tr>
-            <td>Designation:</td>
-            <td>{{ tempUser.designation|default_if_none:"-" }}</td>
-        </tr>
-        <tr>
-            <td>Institution:</td>
-            <td>{{ tempUser.institution|default_if_none:"-" }}</td>
-        </tr>
-        
-        {% if user.accountType == "Teacher" %}
-        <tr>
-            <td>Account Type:</td>
-            <td>{{ tempUser.accountType }}</td>
-        </tr>
-        <tr>
-            <td>Time Online Today:</td>
-            <td>{{ timeOnline }}</td>
-        </tr>
-        {% endif %}
-    </tbody>
-
+    {% if user.accountType == "Teacher" %}
+    <tr>
+      <td>Account Type:</td>
+      <td>{{ tempUser.accountType }}</td>
+    </tr>
+    <tr>
+      <td>Time Online Today:</td>
+      <td>{{ timeOnline }}</td>
+    </tr>
+    {% endif %}
+  </tbody>
 </table>
 
-<br><br>
+<br /><br />
 <h4 class="left-align">Classes</h4>
-<hr> 
+<hr />
 
 <table>
-    
-    <thead>
-        <th>Class Name</th>
-        <th>Institution</th>
-    </thead>
+  <thead>
+    <th>Class Name</th>
+    <th>Institution</th>
+  </thead>
 
-    <tbody>
-        {% for i in classes %}
-        <tr>
-            <td>
-                <a href="/class/{{ i.id }}/accounts">{{ i.className }}</a>
-            </td>
-            <td>{{ i.classInstitution }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-
+  <tbody>
+    {% for i in classes %}
+    <tr>
+      <td>
+        <a href="/class/{{ i.id }}/accounts">{{ i.className }}</a>
+      </td>
+      <td>{{ i.classInstitution }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 
-{% if quizResults %}
-    <br><br>
-    <h4 class="left-align">Quizzes</h4>
-    <hr> 
+{% if attempts %}
+<br /><br />
+<h4 class="left-align">Quizzes</h4>
+<hr />
 
-    <table>
-        
-        <thead>
-            <th>Quiz Name</th>
-            <th>Score</th>
-            <th>Competency</th>
-        </thead>
+<table>
+  <thead>
+    <th>Quiz Name</th>
+    <th>Score</th>
+    <th>Competency</th>
+  </thead>
 
-        <tbody>
-            {% for quizName, data in quizResults.items %}
-            <tr>
-                <td>
-                    <a href="/quizzes/viewAns/{{ quizName|b64encode }}/{{ tempUser.id|urlencode:"" }}"> {{ quizName }} </a>
-                </td>
-                <td>{{ data.0 }}</td>
-                <td>{% if data.1 %}Competent 😃{% else %}Not Yet Competent{% endif %}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% if user.accountType == "Teacher" %}
-    <form method="POST">{% csrf_token %}<button class="submitButton red waves-effect waves-light btn" style="margin-top: 20px;" type="submit"><i class="material-icons right">remove_circle</i>clear quiz responses</button>
-    {% endif %}
-    </form>
+  <tbody>
+    {% for attempt in attempts %}
+    <tr>
+      <td>
+        <a href="/quizzes/{{ attempt.quiz.quizID }}/do/"> {{ attempt.quiz.quizName }} </a>
+      </td>
+      <td>{{ attempt.score }}</td>
+      <td>
+        {% if attempt.score >= attempt.quiz.passingScore %}Competent 😃<!--           -->
+        {% else %}Not Yet Competent{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% if user.accountType == "Teacher" %}
+<form method="POST">
+  {% csrf_token %}<button
+    class="submitButton red waves-effect waves-light btn"
+    style="margin-top: 20px"
+    type="submit"
+  >
+    <i class="material-icons right">remove_circle</i>clear quiz responses
+  </button>
+  {% endif %}
+</form>
 
-
-    <p style="padding-top: 50px;"></p>
-{% endif %}
-{% endblock %}
+<p style="padding-top: 50px"></p>
+{% endif %} {% endblock %}

@@ -7,12 +7,14 @@ from quizzes.models import QuestionTag
 
 from .models import User, Course, StudentClass, Module
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 
 admin.site.unregister(Group)
 
+Group.objects.get(name="SuperAdmin").permissions.set(Permission.objects.all())
 
 # Register your models here.
+
 
 class ModuleInline(admin.TabularInline):
     model = Module
@@ -142,7 +144,7 @@ class UserAdmin(BaseUserAdmin):
         ('Quiz Responses', {'fields': ('quizResponses', )}),
         ('Time Online', {'fields': ('timeOnline', )}),
         ('Permissions', {'fields': ('is_staff', 'groups',)}),
-        # ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions', )}),
+        #('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions', )}),
     )
     add_fieldsets = (
         (None, {

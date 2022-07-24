@@ -16,8 +16,6 @@ urlpatterns = [
     path('course/create/<str:classId>', views.createCourse, name='Create Course'),
     path('module/create/<str:courseId>',
          views.createModule, name='Create Module'),
-    path('account/<str:userId>/<str:quizName>',
-         views.individualAccountQuizView, name='Individual Account Quiz View'),
     path('account/<str:userId>', views.individualAccountView,
          name='Individual Account View'),
     path('classes/', views.classListView, name='Class List View'),

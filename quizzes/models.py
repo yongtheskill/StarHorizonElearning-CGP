@@ -158,6 +158,9 @@ class Question(CloneMixin, models.Model):
             "optionOrder": self.optionOrder,
         }
 
+    def __str__(self) -> str:
+        return str(self.text)
+
 
 class Option(models.Model):
     text = models.CharField(
@@ -187,7 +190,7 @@ class QuizAttempt(models.Model):
         }
 
     def __str__(self):
-        return f"{self.quiz.name}: {self.student.username}"
+        return f"{self.quiz.quizName}: {self.student.username}"
 
 
 class QuestionAttempt(models.Model):
