@@ -270,6 +270,9 @@ def duplicateQuiz(request, quizID):
 @login_required
 def submit(request, quizID):
     if request.method == "POST":
+        if QuizAttempt.objects.get(quiz__quizID=quizID, student_id=request.user.id).exists():
+            return redirect("/quizzes/" + quizID + "/do/")
+
         quizObj = Quiz.objects.get(quizID=quizID)
         data = json.loads(request.body)
 
