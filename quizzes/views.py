@@ -277,7 +277,7 @@ def cbValidation(request):
 
 @login_required
 def deleteQuiz(request, quizID):
-    Quiz.objects.get(quizID=quizID).delete()
+    Quiz.objects.filter(quizID=quizID)[0].delete()
     return redirect("/quizzes/manage/?m=qd")
 
 
@@ -287,7 +287,20 @@ def duplicateQuiz(request, quizID):
     qClone = quizObj.make_clone()
     qClone.quizName += " copy"
     qClone.quizID += "r"
+    while Quiz.objects.filter(quizID=qClone.quizID).exists():
+        qClone.quizID += "r"
     qClone.save()
+    for qn in qClone.questions.all():
+        if qn.type == 'cb' and qn.autoGrade:
+            oldIds = json.loads(qn.cbAnswer)
+            newIds = []
+            for oldId in oldIds:
+                qtext = Option.objects.get(id=oldId).text
+                newId = qn.options.get(text=qtext).id
+                newIds.append(newId)
+            qn.cbAnswer = json.dumps(newIds)
+            qn.save()
+
     return redirect("/quizzes/" + qClone.quizID + "/edit/")
 
 
@@ -304,7 +317,6 @@ def submit(request, quizID):
 
         attempt = QuizAttempt()
         attempt.quiz = quizObj
-        # attempt.student = request.user
         attempt.student = User.objects.get(id=request.user.id)
         att = attempt.save()
 
