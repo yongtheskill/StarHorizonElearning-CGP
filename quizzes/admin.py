@@ -38,6 +38,8 @@ class QuizAttemptAdmin(admin.ModelAdmin):
     list_display.append("student")
     list_display.append("score")
 
+    search_fields = ['quiz__quizName', 'student__username', 'student__email']
+
     inlines = [QuestionAttemptInline]
 
     def __str__(self):
