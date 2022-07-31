@@ -305,6 +305,18 @@ def duplicateQuiz(request, quizID):
 
 
 @login_required
+def clearCbOptions(request, quizID):
+    if request.user.username != 'YonkTeacher':
+        return JsonResponse({'failure': 'not authorised'})
+    quiz = Quiz.objects.get(quizID=quizID)
+    for qn in quiz.questions.all():
+        if qn.type == 'cb':
+            qn.cbAnswer = '[]'
+            qn.save()
+    return JsonResponse({'success': True})
+
+
+@login_required
 def submit(request, quizID):
     if request.method == "POST":
         if QuizAttempt.objects.filter(quiz__quizID=quizID, student_id=request.user.id).exists():

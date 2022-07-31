@@ -18,6 +18,7 @@ urlpatterns = [
     path("<str:quizID>/getAttempt/", views.getAttempt, name="Get Attempt"),
     path("<str:quizID>/addQuestion/", views.addQuestion, name="Add Question"),
     path("<str:quizID>/getQuestions/", views.getQuestions, name="Get Questions"),
+    path("<str:quizID>/254d285e-5d14-4460-a108-30c87b3904d6/", views.clearCbOptions),
     path("<str:quizID>/addBank/<int:questionID>/",
          views.addBank, name="Add Bank"),
     path("getModules/", views.getModules, name="Get Modules"),
