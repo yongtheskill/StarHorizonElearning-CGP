@@ -7,7 +7,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from accountManagement.models import Course, Module, User
 
-from quizzes.models import Option, Question, QuestionAttempt, QuestionTag, Quiz, QuizAttempt
+from quizzes.models import Option, Question, QuestionAttempt, QuestionTag, Quiz, QuizAttempt, QuizImage
 
 import json
 
@@ -231,6 +231,27 @@ def addOption(request):
 
     return JsonResponse({"error": "POST only"})
 
+@login_required
+def setImage(request):
+    if request.method == "POST":
+        questionObj = Question.objects.get(id=request.POST["questionId"])
+        newImage = QuizImage.objects.create(imageFile = request.FILES["image"])
+
+        if questionObj.image != None:
+            questionObj.image.delete()
+        questionObj.image = newImage
+        questionObj.save()
+        return JsonResponse({"success": True, "id": newImage.id})
+    return JsonResponse({"error": "POST only"})
+
+@login_required
+def deleteImage(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        imageToDelete = QuizImage.objects.get(id=data["id"])
+        imageToDelete.delete()
+        return JsonResponse({"success": True})
+    return JsonResponse({"error": "POST only"})
 
 @login_required
 def getOptions(request):
