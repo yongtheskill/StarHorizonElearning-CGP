@@ -2,6 +2,8 @@ from datetime import datetime
 from django.db import models
 from model_clone import CloneMixin
 
+from StarHorizonElearning.storage_backends import QuizImageStorage
+
 from accountManagement.models import Course, Module, User
 
 import pytz
@@ -106,6 +108,11 @@ class Question(CloneMixin, models.Model):
     optionOrder = models.CharField(
         max_length=9999, verbose_name="Option Order", default="[]"
     )
+
+    image = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="question", null=True
+    )
+
     type = models.CharField(
         max_length=8,
         choices=[
@@ -133,6 +140,9 @@ class Question(CloneMixin, models.Model):
 
     def toDict(self):
         qtag = None
+        imageId = None
+        if self.image != None:
+            imageId = self.image.id
         if self.questionTag != None:
             qtag = self.questionTag.toDict()
         return {
@@ -147,15 +157,20 @@ class Question(CloneMixin, models.Model):
             "cbAnswer": self.cbAnswer,
             "questionTag": qtag,
             "questionName": self.name
+            "imageId": imageId
         }
 
     def doToDict(self):
+        imageId = None
+        if self.image != None:
+            imageId = self.image.id
         return {
             "id": self.id,
             "text": self.text,
             "type": self.type,
             "options": [i.toDict() for i in self.options.all()],
             "optionOrder": self.optionOrder,
+            "imageId": imageId
         }
 
     def __str__(self) -> str:
@@ -224,3 +239,10 @@ class QuestionAttempt(models.Model):
             "cbAnswer": self.cbAnswer,
             "isCorrect": self.isCorrect,
         }
+
+
+class QuizImage(models.Model):
+    imageFile = models.FileField(storage=QuizImageStorage()) 
+    
+    def __str__(self):
+         return self.id
