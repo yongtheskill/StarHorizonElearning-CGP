@@ -8,6 +8,11 @@ class MediaStorage(S3Boto3Storage):
     aws_access_key_id = settings.AWS_ACCESS_KEY_ID
     aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY
 
+class QuizImageStorage(S3Boto3Storage):
+    location = 'quizImages'
+    file_overwrite = False
+    aws_access_key_id = settings.AWS_ACCESS_KEY_ID
+    aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY
 
 class H5PStorage(S3Boto3Storage):
     location = 'h5p-zipped'
