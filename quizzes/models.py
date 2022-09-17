@@ -100,6 +100,11 @@ class QuestionTag(models.Model):
             "id": self.id
         }
 
+class QuizImage(models.Model):
+    imageFile = models.FileField(storage=QuizImageStorage()) 
+    
+    def __str__(self):
+         return self.id
 
 class Question(CloneMixin, models.Model):
     text = models.CharField(
@@ -110,7 +115,7 @@ class Question(CloneMixin, models.Model):
     )
 
     image = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name="question", null=True
+        QuizImage, on_delete=models.SET_NULL, related_name="question", null=True
     )
 
     type = models.CharField(
@@ -140,9 +145,9 @@ class Question(CloneMixin, models.Model):
 
     def toDict(self):
         qtag = None
-        imageId = None
+        imageUrl = None
         if self.image != None:
-            imageId = self.image.id
+            imageUrl = self.image.imageFile.url
         if self.questionTag != None:
             qtag = self.questionTag.toDict()
         return {
@@ -156,21 +161,21 @@ class Question(CloneMixin, models.Model):
             "mcAnswer": self.mcAnswer,
             "cbAnswer": self.cbAnswer,
             "questionTag": qtag,
-            "questionName": self.name
-            "imageId": imageId
+            "questionName": self.name,
+            "imageUrl": imageUrl
         }
 
     def doToDict(self):
-        imageId = None
+        imageUrl = None
         if self.image != None:
-            imageId = self.image.id
+            imageUrl = self.image.imageFile.url
         return {
             "id": self.id,
             "text": self.text,
             "type": self.type,
             "options": [i.toDict() for i in self.options.all()],
             "optionOrder": self.optionOrder,
-            "imageId": imageId
+            "imageUrl": imageUrl
         }
 
     def __str__(self) -> str:
@@ -241,8 +246,4 @@ class QuestionAttempt(models.Model):
         }
 
 
-class QuizImage(models.Model):
-    imageFile = models.FileField(storage=QuizImageStorage()) 
-    
-    def __str__(self):
-         return self.id
+

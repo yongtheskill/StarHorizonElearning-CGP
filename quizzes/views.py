@@ -238,17 +238,19 @@ def setImage(request):
         newImage = QuizImage.objects.create(imageFile = request.FILES["image"])
 
         if questionObj.image != None:
+            questionObj.image.imageFile.delete(save=False)
             questionObj.image.delete()
         questionObj.image = newImage
         questionObj.save()
-        return JsonResponse({"success": True, "id": newImage.id})
+        return JsonResponse({"success": True, "imageUrl": newImage.imageFile.url})
     return JsonResponse({"error": "POST only"})
 
 @login_required
 def deleteImage(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        imageToDelete = QuizImage.objects.get(id=data["id"])
+        imageToDelete = Question.objects.get(id=data["questionId"]).image
+        imageToDelete.imageFile.delete(save=False)
         imageToDelete.delete()
         return JsonResponse({"success": True})
     return JsonResponse({"error": "POST only"})

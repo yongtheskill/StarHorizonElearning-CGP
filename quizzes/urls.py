@@ -5,6 +5,8 @@ from . import views
 urlpatterns = [
     path("manage/", views.manageQuizzes, name="Manage Quizzes"),
     path("create/", views.createQuiz, name="Create Quiz"),
+    path("setImage/", views.setImage, name="Set Image"),
+    path("deleteImage/", views.deleteImage, name="Delete Image"),
     path("<str:quizID>/edit/", views.editQuiz, name="Edit Quiz"),
     path("<str:quizID>/do/", views.doQuiz, name="Do Quiz"),
     path("<str:quizID>/duplicate/", views.duplicateQuiz, name="Duplicate Quiz"),
