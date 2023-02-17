@@ -201,6 +201,8 @@ class QuizAttempt(models.Model):
         User, on_delete=models.CASCADE, related_name="attempts")
     score = models.IntegerField(default=0)
 
+    timestamp = models.CharField(max_length=500, null=True)
+
     def toDict(self):
         return {
             "id": self.id,

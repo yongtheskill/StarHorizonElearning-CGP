@@ -482,7 +482,7 @@ def exportQuiz(request):
                         tryAppend(newLine, "0")
                 else:
                     tryAppend(newLine, "-")
-            except:
+            except: 
                 tryAppend(newLine, "DNA")
 
         ws.append(newLine)
