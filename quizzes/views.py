@@ -472,15 +472,18 @@ def exportQuiz(request):
             tryAppend(newLine, "Not yet competent")
 
         for question in questions:
-            questionAttempt = attempt.questionAttempts.get(
-                question_id=question.id)
-            if question.autoGrade:
-                if questionAttempt.isCorrect:
-                    tryAppend(newLine, "1")
+            try:
+                questionAttempt = attempt.questionAttempts.get(
+                    question_id=question.id)
+                if question.autoGrade:
+                    if questionAttempt.isCorrect:
+                        tryAppend(newLine, "1")
+                    else:
+                        tryAppend(newLine, "0")
                 else:
-                    tryAppend(newLine, "0")
-            else:
-                tryAppend(newLine, "-")
+                    tryAppend(newLine, "-")
+            except:
+                tryAppend(newLine, "DNA")
 
         ws.append(newLine)
 
