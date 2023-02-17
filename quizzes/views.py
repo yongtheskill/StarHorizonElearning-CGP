@@ -353,6 +353,7 @@ def submit(request, quizID):
         attempt = QuizAttempt()
         attempt.quiz = quizObj
         attempt.student = User.objects.get(id=request.user.id)
+        attempt.timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         att = attempt.save()
 
         score = 0
@@ -447,7 +448,7 @@ def exportQuiz(request):
 
     # format header
     baseHeader = ["Class", "Name", "Designation", "Start Date",
-                  "QuizName", "Score", "Passing Score", "Competency"]
+                  "QuizName", "Timestamp", "Score", "Passing Score", "Competency"]
 
     questions = list(Question.objects.filter(quiz_id=qte.id))
 
@@ -459,11 +460,16 @@ def exportQuiz(request):
         user = attempt.student
         newLine = []
 
+        timestamp = "-"
+        if attempt.timestamp:
+            timestamp = attempt.timestamp
+
         tryAppend(newLine, str(user.classes.first()))
         tryAppend(newLine, str(user.first_name + " " + user.last_name))
         tryAppend(newLine, user.designation)
         tryAppend(newLine, str(user.startDate))
         tryAppend(newLine, qte.quizName)
+        tryAppend(newLine, timestamp)
         tryAppend(newLine, attempt.score)
         tryAppend(newLine, qte.passingScore)
         if attempt.score >= qte.passingScore:
