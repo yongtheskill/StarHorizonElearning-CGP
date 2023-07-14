@@ -16,9 +16,7 @@
             <div class="text-h4" style="font-weight: 700">
               {{ attempt.quizName }}
             </div>
-            <div class="text-subtitle-1" style="margin-left: 0.8rem">
-              Quiz review
-            </div>
+            <div class="text-subtitle-1" style="margin-left: 0.8rem">Quiz review</div>
           </v-card>
         </v-col>
       </v-row>
@@ -26,20 +24,13 @@
       <div v-for="(question, i) in questionAttempts" :key="question.id">
         <v-row>
           <v-col>
-            <QuestionReview
-              :questionAttempt="question"
-              :questionNumber="i + 1"
-            />
+            <QuestionReview :questionAttempt="question" :questionNumber="i + 1" />
           </v-col>
         </v-row>
       </div>
 
       <v-row>
-        <v-col
-          xs="12"
-          class="justify-end d-flex"
-          style="padding-bottom: 3rem; cursor: not-allowed"
-        >
+        <v-col xs="12" class="justify-end d-flex" style="padding-bottom: 3rem; cursor: not-allowed">
           <v-btn color="primary" disabled>already submitted</v-btn>
         </v-col>
       </v-row>
@@ -48,7 +39,7 @@
 </template>
 
 <script>
-import QuestionReview from "./QuestionReview.vue";
+import QuestionReview from './QuestionReview.vue';
 
 export default {
   components: {
@@ -56,6 +47,7 @@ export default {
   },
   props: {
     attempt: Object,
+    allowRetries: Boolean,
   },
   data() {
     return {
@@ -78,9 +70,7 @@ export default {
     );
 
     for (const i of orderData) {
-      const nextQn = this.attempt.questionAttempts.find(
-        (q) => q.question.id === i
-      );
+      const nextQn = this.attempt.questionAttempts.find((q) => q.question.id === i);
       if (nextQn !== undefined) {
         questions.push(nextQn);
       }

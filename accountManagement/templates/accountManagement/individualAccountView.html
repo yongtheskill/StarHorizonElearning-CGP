@@ -67,7 +67,9 @@
 
 {% if attempts %}
 <br /><br />
-<h4 class="left-align">Quizzes</h4>
+<h4 class="left-align">
+  {% if user.accountType == "Teacher" %}Quiz Attempts{% else %}Quizzes{% endif %}
+</h4>
 <hr />
 
 <table>
@@ -75,6 +77,9 @@
     <th>Quiz Name</th>
     <th>Score</th>
     <th>Competency</th>
+    {% if user.accountType == "Teacher" %}
+    <th>Timestamp</th>
+    {% endif %}
   </thead>
 
   <tbody>
@@ -88,6 +93,9 @@
         {% if attempt.score >= attempt.quiz.passingScore %}Competent 😃<!--           -->
         {% else %}Not Yet Competent{% endif %}
       </td>
+      {% if user.accountType == "Teacher" %}
+      <td>{{ attempt.timestamp }}</td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>
@@ -97,12 +105,11 @@
   {% csrf_token %}<button
     class="submitButton red waves-effect waves-light btn"
     style="margin-top: 20px"
-    type="submit"
-  >
+    type="submit">
     <i class="material-icons right">remove_circle</i>clear quiz responses
   </button>
-  {% endif %}
 </form>
+{% endif %}
 
 <p style="padding-top: 50px"></p>
 {% endif %} {% endblock %}

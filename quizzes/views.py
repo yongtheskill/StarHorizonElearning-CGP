@@ -351,12 +351,13 @@ def clearCbOptions(request, quizID):
 # @login_required
 def submit(request, quizID):
     if request.method == "POST":
-        if QuizAttempt.objects.filter(
-            quiz__quizID=quizID, student_id=request.user.id
-        ).exists():
-            return redirect("/quizzes/" + quizID + "/do/")
-
         quizObj = Quiz.objects.get(quizID=quizID)
+        if not quizObj.allowRetries:
+            if QuizAttempt.objects.filter(
+                quiz__quizID=quizID, student_id=request.user.id
+            ).exists():
+                return redirect("/quizzes/" + quizID + "/do/")
+
         data = json.loads(request.body)
 
         questions = list(quizObj.questions.all())
@@ -408,14 +409,28 @@ def submit(request, quizID):
 
 # @login_required
 def getAttempt(request, quizID):
-    try:
-        attempt = QuizAttempt.objects.get(
-            quiz__quizID=quizID, student_id=request.user.id
-        )
+    attempt = (
+        QuizAttempt.objects.filter(quiz__quizID=quizID, student_id=request.user.id)
+        .order_by("-score")
+        .first()
+    )
 
-        return JsonResponse({"attempted": True, "attempt": attempt.toDict()})
-    except:
+    if attempt == None:
         return JsonResponse({"attempted": False})
+
+    quizObj = Quiz.objects.get(quizID=quizID)
+    allowRetries = quizObj.allowRetries == 1
+
+    if attempt.score >= quizObj.passingScore:
+        allowRetries = False
+
+    return JsonResponse(
+        {
+            "attempted": True,
+            "attempt": attempt.toDict(),
+            "allowRetries": allowRetries,
+        }
+    )
 
 
 # quiz management page
@@ -477,23 +492,36 @@ def exportQuiz(request):
 
     ws.append(baseHeader)
 
-    for attempt in list(QuizAttempt.objects.filter(quiz_id=qte.id)):
+    attempts = QuizAttempt.objects.filter(quiz_id=qte.id)
+    quizRecords = {}
+    for attempt in attempts:
+        quizId = attempt.quiz.id
+        score = attempt.score
+        if quizId in quizRecords:
+            if quizRecords[quizId].score < score:
+                quizRecords[quizId] = attempt
+        else:
+            quizRecords[quizId] = attempt
+
+    attempts = quizRecords.values()
+
+    for attempt in attempts:
         user = attempt.student
         newLine = []
 
         timestamp = "-"
         if attempt.timestamp:
-            timestamp = attempt.timestamp
+            timestamp = str(attempt.timestamp)
 
         tryAppend(newLine, str(user.classes.first()))
         tryAppend(newLine, str(user.first_name + " " + user.last_name))
         tryAppend(newLine, user.designation)
         tryAppend(newLine, str(user.startDate))
-        tryAppend(newLine, qte.quizName)
+        tryAppend(newLine, quizName)
         tryAppend(newLine, timestamp)
         tryAppend(newLine, attempt.score)
-        tryAppend(newLine, qte.passingScore)
-        if attempt.score >= qte.passingScore:
+        tryAppend(newLine, passingScore)
+        if attempt.score >= passingScore:
             tryAppend(newLine, "Competent")
         else:
             tryAppend(newLine, "Not yet competent")

@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.db import models
 from model_clone import CloneMixin
+from django.utils import timezone
 
 from StarHorizonElearning.storage_backends import QuizImageStorage
 
@@ -15,7 +16,6 @@ sgt = pytz.timezone("Asia/Singapore")
 
 
 class Quiz(CloneMixin, models.Model):
-
     quizName = models.CharField(max_length=200, verbose_name="quiz name")
     quizID = models.CharField(max_length=200, verbose_name="quiz id")
     quizDueDate = models.DateTimeField(blank=True, null=True)
@@ -33,14 +33,11 @@ class Quiz(CloneMixin, models.Model):
         max_length=9999, verbose_name="Question Order", default="[]"
     )
 
-    randomOptions = models.IntegerField(
-        verbose_name="randomise options", default=False)
+    randomOptions = models.IntegerField(verbose_name="randomise options", default=False)
     randomQuestions = models.IntegerField(
         verbose_name="randomise questions", default=False
     )
-    allowRetries = models.IntegerField(
-        verbose_name="allow retries", default=False
-    )
+    allowRetries = models.IntegerField(verbose_name="allow retries", default=False)
 
     _clone_m2o_or_o2m_fields = ["questions"]
 
@@ -98,21 +95,18 @@ class QuestionTag(models.Model):
     )
 
     def toDict(self):
-        return {
-            "courseId": self.course.id,
-            "text": self.text,
-            "id": self.id
-        }
+        return {"courseId": self.course.id, "text": self.text, "id": self.id}
+
 
 class QuizImage(models.Model):
-    imageFile = models.FileField(storage=QuizImageStorage()) 
-    
+    imageFile = models.FileField(storage=QuizImageStorage())
+
     def __str__(self):
-         return self.id
+        return self.id
+
 
 class Question(CloneMixin, models.Model):
-    text = models.CharField(
-        max_length=999, verbose_name="Question Text", null=True)
+    text = models.CharField(max_length=999, verbose_name="Question Text", null=True)
     autoGrade = models.BooleanField(default=False)
     optionOrder = models.CharField(
         max_length=9999, verbose_name="Option Order", default="[]"
@@ -133,16 +127,17 @@ class Question(CloneMixin, models.Model):
         default="cb",
     )
     quiz = models.ForeignKey(
-        Quiz, on_delete=models.CASCADE, related_name="questions", null=True)
+        Quiz, on_delete=models.CASCADE, related_name="questions", null=True
+    )
     saAnswer = models.CharField(max_length=999, default="")
     mcAnswer = models.IntegerField(default=-1)
     cbAnswer = models.CharField(max_length=999, default="[]")
 
     questionTag = models.ForeignKey(
-        QuestionTag, on_delete=models.CASCADE, related_name="questions", null=True)
+        QuestionTag, on_delete=models.CASCADE, related_name="questions", null=True
+    )
 
-    name = models.CharField(
-        max_length=999, verbose_name="Question Name", default="")
+    name = models.CharField(max_length=999, verbose_name="Question Name", default="")
     isBankQuestion = models.BooleanField(default=False)
 
     _clone_m2o_or_o2m_fields = ["options"]
@@ -166,7 +161,7 @@ class Question(CloneMixin, models.Model):
             "cbAnswer": self.cbAnswer,
             "questionTag": qtag,
             "questionName": self.name,
-            "imageUrl": imageUrl
+            "imageUrl": imageUrl,
         }
 
     def doToDict(self):
@@ -179,7 +174,7 @@ class Question(CloneMixin, models.Model):
             "type": self.type,
             "options": [i.toDict() for i in self.options.all()],
             "optionOrder": self.optionOrder,
-            "imageUrl": imageUrl
+            "imageUrl": imageUrl,
         }
 
     def __str__(self) -> str:
@@ -187,8 +182,7 @@ class Question(CloneMixin, models.Model):
 
 
 class Option(models.Model):
-    text = models.CharField(
-        max_length=999, verbose_name="Option text", null=True)
+    text = models.CharField(max_length=999, verbose_name="Option text", null=True)
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, related_name="options"
     )
@@ -201,11 +195,10 @@ class QuizAttempt(models.Model):
     quiz = models.ForeignKey(
         Quiz, on_delete=models.CASCADE, related_name="quizAttempts"
     )
-    student = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="attempts")
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name="attempts")
     score = models.IntegerField(default=0)
 
-    timestamp = models.CharField(max_length=500, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def toDict(self):
         return {
@@ -250,6 +243,3 @@ class QuestionAttempt(models.Model):
             "cbAnswer": self.cbAnswer,
             "isCorrect": self.isCorrect,
         }
-
-
-

@@ -104,17 +104,24 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col sm="12" md="6">
+                <v-col sm="12" md="4">
                   <v-switch v-model="randomQuestions" inset>
                     <template v-slot:label>
                       <div class="black--text">Randomise questions</div>
                     </template>
                   </v-switch>
                 </v-col>
-                <v-col sm="12" md="6">
+                <v-col sm="12" md="4">
                   <v-switch v-model="randomOptions" inset>
                     <template v-slot:label>
                       <div class="black--text">Randomise options</div>
+                    </template>
+                  </v-switch>
+                </v-col>
+                <v-col sm="12" md="4">
+                  <v-switch v-model="allowRetries" inset>
+                    <template v-slot:label>
+                      <div class="black--text">Allow retries</div>
                     </template>
                   </v-switch>
                 </v-col>
@@ -225,6 +232,7 @@ export default {
       quizDueDate: null,
       randomOptions: false,
       randomQuestions: false,
+      allowRetries: false,
       moduleOptions: [],
       courses: [],
       courseId: -1,
@@ -297,6 +305,7 @@ export default {
             passingScore: th.passingScore,
             randomOptions: th.randomOptions ? 1 : 0,
             randomQuestions: th.randomQuestions ? 1 : 0,
+            allowRetries: th.allowRetries ? 1 : 0,
             questionOrder: th.orderData,
           },
           {
@@ -369,6 +378,9 @@ export default {
     randomQuestions() {
       this.settingUpdated();
     },
+    allowRetries() {
+      this.settingUpdated();
+    },
     updatingIDs(n) {
       if (n.length > 0) {
         window.onbeforeunload = function () {
@@ -414,6 +426,7 @@ export default {
       _.extend(this, r.data);
       this.randomOptions = this.randomOptions === 1;
       this.randomQuestions = this.randomQuestions === 1;
+      this.allowRetries = this.allowRetries === 1;
       this.loadModules(r.data.courseId);
 
       const qorder = JSON.parse(this.questionOrder);
