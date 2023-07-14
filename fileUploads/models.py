@@ -6,7 +6,7 @@ from accountManagement.models import Module
 class FileUpload(models.Model):
     
     fileName = models.CharField(max_length=200, verbose_name="file name")
-    fileID = models.CharField(max_length=200, verbose_name="file id")
+    fileID = models.CharField(max_length=200, verbose_name="file id", primary_key=True)
     uploadedFile = models.FileField(storage=MediaStorage()) 
     creationDate = models.DateTimeField(auto_now_add=True)
 

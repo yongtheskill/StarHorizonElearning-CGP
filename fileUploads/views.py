@@ -25,7 +25,7 @@ def manageUploads(request):
 @login_required
 def uploadFile(request):
     nowTime = datetime.now()
-    timestamp = nowTime.strftime("%Y-%m-%d-%H-%M")
+    timestamp = nowTime.strftime("%Y-%m-%d-%H-%M-0")
 
     courseObjects = list(Course.objects.all())
     courseIDs = [i.id for i in courseObjects]
@@ -43,45 +43,53 @@ def uploadFile(request):
         # validate that file name is unique
         if (FileUpload.objects.filter(fileName=fileName).exists()):
             context = {
-                **baseContext, "error": "Sorry, a file with this name already exists, please choose a different name for your file.", }
+                "fileObjects": FileUpload.objects.all, "error": "Sorry, a file with this name already exists, please choose a different name for your file.", }
             return render(request, 'fileUploads/manage.html', context)
-        else:
+        
+        
+        # validate that file name is unique
+        while (FileUpload.objects.filter(fileID=fileID).exists()):
+            c = fileID.split('-')
+            n = c[-1]
+            n = str(int(n) + 1)
+            c[-1] = n
+            fileID = '-'.join(c)
+        
 
-            if 'uploadedFile' in request.FILES:
-                # get extension
-                fileExtension = re.findall(
-                    r"\..*", request.POST["fileName"])[-1]
-
-                # handle files
-                request.FILES['uploadedFile'].name = "%s%s" % (
-                    fileID, fileExtension)
-                if (FileUpload.objects.filter(uploadedFile=request.FILES['uploadedFile']).exists()):
-                    # return error
-                    context = {
-                        **baseContext, "error": "Error, the file ID already exists, please try again", }
-                    return render(request, 'fileUploads/manage.html', context)
-
-            else:
+        if 'uploadedFile' in request.FILES:
+            # get extension
+            fileExtension = re.findall(
+                r"\..*", request.POST["fileName"])[-1]
+            # handle files
+            request.FILES['uploadedFile'].name = "%s%s" % (
+                fileID, fileExtension)
+            if (FileUpload.objects.filter(uploadedFile=request.FILES['uploadedFile']).exists()):
                 # return error
                 context = {
-                    **baseContext, "error": "No file uploaded, please select a file to upload", }
+                    **baseContext, "error": "Error, the file ID already exists, please try again", }
                 return render(request, 'fileUploads/manage.html', context)
 
-            # find matching course
-            moduleID = request.POST["moduleID"]
-            module = Module.objects.get(pk=moduleID)
-
-            # create project with entered values
-            newFile = FileUpload()
-            newFile.fileName = fileName
-            newFile.fileID = fileID
-            newFile.uploadedFile = request.FILES['uploadedFile']
-            newFile.module = module
-            newFile.save()
-            # return success
-            context = {"fileObjects": FileUpload.objects.all,
-                       "notification": "File: %s successfully uploaded!" % (fileName), }
+        else:
+            # return error
+            context = {
+                **baseContext, "error": "No file uploaded, please select a file to upload", }
             return render(request, 'fileUploads/manage.html', context)
+
+        # find matching course
+        moduleID = request.POST["moduleID"]
+        module = Module.objects.get(pk=moduleID)
+
+        # create project with entered values
+        newFile = FileUpload()
+        newFile.fileName = fileName
+        newFile.fileID = fileID
+        newFile.uploadedFile = request.FILES['uploadedFile']
+        newFile.module = module
+        newFile.save()
+        # return success
+        context = {"fileObjects": FileUpload.objects.all,
+                   "notification": "File: %s successfully uploaded!" % (fileName), }
+        return render(request, 'fileUploads/manage.html', context)
 
     else:
         return render(request, 'fileUploads/create.html', baseContext)
