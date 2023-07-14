@@ -498,9 +498,9 @@ def exportQuiz(request):
         quizId = attempt.quiz.id
         score = attempt.score
         if quizId in quizRecords:
+            quizRecords[quizId]["tries"] += 1
             if quizRecords[quizId]["attempt"].score < score:
-                nTries = quizRecords[quizId]["tries"]
-                quizRecords[quizId] = {"attempt": attempt, "tries": nTries + 1}
+                quizRecords[quizId]["attempt"] = attempt
         else:
             quizRecords[quizId] = {"attempt": attempt, "tries": 1}
 
