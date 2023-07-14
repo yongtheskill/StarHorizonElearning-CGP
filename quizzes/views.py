@@ -24,7 +24,7 @@ import pytz
 sgt = pytz.timezone("Asia/Singapore")
 
 
-# @login_required
+@login_required
 def manageQuizzes(request):
     messageCode = request.GET.get("m", "")
     context = {"quizObjects": Quiz.objects.all}
@@ -37,7 +37,7 @@ def manageQuizzes(request):
     return render(request, "manage.html", context)
 
 
-# @login_required
+@login_required
 def createQuiz(request):
     if request.method == "POST":
         newQuiz = Quiz()
@@ -59,17 +59,17 @@ def createQuiz(request):
     return render(request, "create.html")
 
 
-# @login_required
+@login_required
 def editQuiz(request, quizID):
     return render(request, "edit.html")
 
 
-# @login_required
+@login_required
 def doQuiz(request, quizID):
     return render(request, "do.html")
 
 
-# @login_required
+@login_required
 def editQuizSettings(request, quizID):
     if request.method == "POST":
         quizObj = Quiz.objects.get(quizID=quizID)
@@ -96,32 +96,32 @@ def editQuizSettings(request, quizID):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def getQuiz(request, quizID):
     quizObj = Quiz.objects.get(quizID=quizID)
     return JsonResponse(quizObj.toDict())
 
 
-# @login_required
+@login_required
 def getQuizDo(request, quizID):
     quizObj = Quiz.objects.get(quizID=quizID)
     return JsonResponse(quizObj.doToDict())
 
 
-# @login_required
+@login_required
 def getCourses(request):
     courses = list(Course.objects.all())
     return JsonResponse({"courses": [i.toDict() for i in courses]})
 
 
-# @login_required
+@login_required
 def getModules(request):
     modules = Module.objects.filter(course_id=request.GET.get("courseId", -1))
 
     return JsonResponse({"modules": [i.toDict() for i in modules]})
 
 
-# @login_required
+@login_required
 def addQuestion(request, quizID):
     if request.method == "POST":
         quizObj = Quiz.objects.get(quizID=quizID)
@@ -135,7 +135,7 @@ def addQuestion(request, quizID):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def addBank(request, quizID, questionID):
     if request.method == "POST":
         quizObj = Quiz.objects.get(quizID=quizID)
@@ -162,19 +162,19 @@ def addBank(request, quizID, questionID):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def getQuestions(request, quizID):
     questions = Question.objects.filter(quiz_id=Quiz.objects.get(quizID=quizID).id)
 
     return JsonResponse({"questions": [i.toDict() for i in questions]})
 
 
-# @login_required
+@login_required
 def getQuestion(request, questionID):
     return JsonResponse(Question.objects.get(id=questionID).toDict())
 
 
-# @login_required
+@login_required
 def deleteQuestion(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -184,14 +184,14 @@ def deleteQuestion(request):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def deleteQuestionBank(request, questionID):
     questionToDelete = Question.objects.get(id=questionID)
     questionToDelete.delete()
     return redirect("/quizzes/bank/")
 
 
-# @login_required
+@login_required
 def editQuestion(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -223,7 +223,7 @@ def editQuestion(request):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def addOption(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -239,7 +239,7 @@ def addOption(request):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def setImage(request):
     if request.method == "POST":
         questionObj = Question.objects.get(id=request.POST["questionId"])
@@ -254,7 +254,7 @@ def setImage(request):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def deleteImage(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -265,13 +265,13 @@ def deleteImage(request):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def getOptions(request):
     options = Option.objects.filter(question_id=request.GET.get("questionId", -1))
     return JsonResponse({"options": [i.toDict() for i in options]})
 
 
-# @login_required
+@login_required
 def editOption(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -284,7 +284,7 @@ def editOption(request):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def deleteOption(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -294,7 +294,7 @@ def deleteOption(request):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def cbValidation(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -307,13 +307,13 @@ def cbValidation(request):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def deleteQuiz(request, quizID):
     Quiz.objects.filter(quizID=quizID)[0].delete()
     return redirect("/quizzes/manage/?m=qd")
 
 
-# @login_required
+@login_required
 def duplicateQuiz(request, quizID):
     quizObj = Quiz.objects.get(quizID=quizID)
     qClone = quizObj.make_clone()
@@ -336,7 +336,7 @@ def duplicateQuiz(request, quizID):
     return redirect("/quizzes/" + qClone.quizID + "/edit/")
 
 
-# @login_required
+@login_required
 def clearCbOptions(request, quizID):
     if request.user.username != "YonkTeacher":
         return JsonResponse({"failure": "not authorised"})
@@ -348,7 +348,7 @@ def clearCbOptions(request, quizID):
     return JsonResponse({"success": True})
 
 
-# @login_required
+@login_required
 def submit(request, quizID):
     if request.method == "POST":
         quizObj = Quiz.objects.get(quizID=quizID)
@@ -407,7 +407,7 @@ def submit(request, quizID):
     return JsonResponse({"error": "POST only"})
 
 
-# @login_required
+@login_required
 def getAttempt(request, quizID):
     attempt = (
         QuizAttempt.objects.filter(quiz__quizID=quizID, student_id=request.user.id)
@@ -434,7 +434,7 @@ def getAttempt(request, quizID):
 
 
 # quiz management page
-# @login_required
+@login_required
 def downloadQuiz(request):
     try:
         selectedId = request.GET["id"]
@@ -459,7 +459,7 @@ def downloadQuiz(request):
     return render(request, "download.html", context)
 
 
-# @login_required
+@login_required
 def exportQuiz(request):
     wb = Workbook()
     qte = Quiz.objects.get(quizID=request.GET["id"])
@@ -555,6 +555,7 @@ def tryAppend(l, data):
         l.append("")
 
 
+@login_required
 def createTag(request, courseID):
     if request.method == "POST":
         newTag = QuestionTag()
@@ -567,6 +568,7 @@ def createTag(request, courseID):
     return JsonResponse({"error": "POST only"})
 
 
+@login_required
 def deleteTag(request, tagID):
     if request.method == "POST":
         tag = QuestionTag.objects.get(id=tagID)
@@ -575,16 +577,19 @@ def deleteTag(request, tagID):
     return JsonResponse({"error": "POST only"})
 
 
+@login_required
 def getTags(request):
     tags = QuestionTag.objects.filter(course_id=request.GET.get("courseId"))
     return JsonResponse({"tags": [tag.toDict() for tag in tags]})
 
 
+@login_required
 def questionBank(request):
     context = {"questions": Question.objects.filter(isBankQuestion=True)}
     return render(request, "bank.html", context)
 
 
+@login_required
 def createBank(request):
     newQuestion = Question()
     newQuestion.isBankQuestion = True
@@ -593,10 +598,12 @@ def createBank(request):
     return redirect("/quizzes/bank/" + str(newQuestion.id) + "/edit/")
 
 
+@login_required
 def editBank(request, questionID):
     return render(request, "editBank.html")
 
 
+@login_required
 def getBank(request):
     questions = Question.objects.filter(isBankQuestion=True)
     return JsonResponse({"questions": [question.toDict() for question in questions]})
