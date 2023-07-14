@@ -38,6 +38,9 @@ class Quiz(CloneMixin, models.Model):
     randomQuestions = models.IntegerField(
         verbose_name="randomise questions", default=False
     )
+    allowRetries = models.IntegerField(
+        verbose_name="allow retries", default=False
+    )
 
     _clone_m2o_or_o2m_fields = ["questions"]
 
@@ -71,6 +74,7 @@ class Quiz(CloneMixin, models.Model):
             "courseId": cId,
             "randomOptions": self.randomOptions,
             "randomQuestions": self.randomQuestions,
+            "allowRetries": self.allowRetries,
             "questionOrder": self.questionOrder,
         }
 
