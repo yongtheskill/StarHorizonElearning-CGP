@@ -481,7 +481,7 @@ def exportQuiz(request):
         "Start Date",
         "QuizName",
         "Timestamp",
-        "Score",
+        "Attempts" "Score",
         "Passing Score",
         "Competency",
     ]
@@ -498,14 +498,16 @@ def exportQuiz(request):
         quizId = attempt.quiz.id
         score = attempt.score
         if quizId in quizRecords:
-            if quizRecords[quizId].score < score:
-                quizRecords[quizId] = attempt
+            if quizRecords[quizId]["attempt"].score < score:
+                nTries = quizRecords[quizId]["tries"]
+                quizRecords[quizId] = {"attempt": attempt, "tries": nTries + 1}
         else:
-            quizRecords[quizId] = attempt
+            quizRecords[quizId] = {"attempt": attempt, "tries": 1}
 
     attempts = quizRecords.values()
 
-    for attempt in attempts:
+    for wrappedAttempt in attempts:
+        attempt = wrappedAttempt["attempt"]
         user = attempt.student
         newLine = []
 
@@ -519,6 +521,7 @@ def exportQuiz(request):
         tryAppend(newLine, str(user.startDate))
         tryAppend(newLine, quizName)
         tryAppend(newLine, timestamp)
+        tryAppend(newLine, wrappedAttempt["tries"])
         tryAppend(newLine, attempt.score)
         tryAppend(newLine, passingScore)
         if attempt.score >= passingScore:
