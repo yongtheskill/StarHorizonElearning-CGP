@@ -481,7 +481,8 @@ def exportQuiz(request):
         "Start Date",
         "QuizName",
         "Timestamp",
-        "Attempts" "Score",
+        "Attempts",
+        "Score",
         "Passing Score",
         "Competency",
     ]
@@ -495,14 +496,14 @@ def exportQuiz(request):
     attempts = QuizAttempt.objects.filter(quiz_id=qte.id)
     quizRecords = {}
     for attempt in attempts:
-        quizId = attempt.quiz.id
+        studentId = attempt.student.id
         score = attempt.score
-        if quizId in quizRecords:
-            quizRecords[quizId]["tries"] += 1
-            if quizRecords[quizId]["attempt"].score < score:
-                quizRecords[quizId]["attempt"] = attempt
+        if studentId in quizRecords:
+            quizRecords[studentId]["tries"] += 1
+            if quizRecords[studentId]["attempt"].score < score:
+                quizRecords[studentId]["attempt"] = attempt
         else:
-            quizRecords[quizId] = {"attempt": attempt, "tries": 1}
+            quizRecords[studentId] = {"attempt": attempt, "tries": 1}
 
     attempts = quizRecords.values()
 
