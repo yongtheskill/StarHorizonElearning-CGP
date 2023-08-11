@@ -16,11 +16,11 @@ os.environ.setdefault(
     "/opt/bitnami/apps/django/django_projects/StarHorizonElearning/egg_cache",
 )
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "StarHorizonElearning.settings")
+from whitenoise import WhiteNoise
 from django.core.wsgi import get_wsgi_application
-from whitenoise.django import DjangoWhiteNoise
 
 application = get_wsgi_application()
-application = DjangoWhiteNoise(application)
+application = WhiteNoise(application, root="/static")
 
 
 """
