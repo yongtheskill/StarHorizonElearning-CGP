@@ -476,7 +476,10 @@ def exportQuiz(request):
     # format header
     baseHeader = [
         "Class",
+        "Username",
+        "Email Address",
         "Name",
+        "Unit",
         "Designation",
         "Start Date",
         "QuizName",
@@ -517,7 +520,10 @@ def exportQuiz(request):
             timestamp = str(attempt.timestamp)
 
         tryAppend(newLine, str(user.classes.first()))
+        tryAppend(newLine, str(user.username))
+        tryAppend(newLine, str(user.email))
         tryAppend(newLine, str(user.first_name + " " + user.last_name))
+        tryAppend(newLine, str(user.unit))
         tryAppend(newLine, user.designation)
         tryAppend(newLine, str(user.startDate))
         tryAppend(newLine, quizName)
