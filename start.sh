@@ -1,1 +1,1 @@
-sudo gunicorn --certfile=/etc/letsencrypt/live/cgpsdotraining-replica.yong.ee/fullchain.pem --keyfile=/etc/letsencrypt/live/cgpsdotraining-replica.yong.ee/privkey.pem --bind 0.0.0.0:443  StarHorizonElearning.wsgi
+sudo gunicorn --chdir /home/ubuntu/StarHorizonElearning-CGP --certfile=/etc/letsencrypt/live/cgpsdotraining-replica.yong.ee/fullchain.pem --keyfile=/etc/letsencrypt/live/cgpsdotraining-replica.yong.ee/privkey.pem --bind 0.0.0.0:443  StarHorizonElearning.wsgi
