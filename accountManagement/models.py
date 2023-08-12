@@ -79,7 +79,7 @@ class User(AbstractUser):
     classes = models.ManyToManyField(StudentClass, blank=True, related_name="users")
 
     quizResponses = models.CharField(
-        max_length=1000000000, verbose_name="quizResponses", null=True, blank=True
+        max_length=1000000, verbose_name="quizResponses", null=True, blank=True
     )
 
     timeOnline = models.DurationField(verbose_name="timeOnline", blank=True, null=True)

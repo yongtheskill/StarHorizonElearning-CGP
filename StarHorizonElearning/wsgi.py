@@ -9,13 +9,21 @@ https://docs.djangoproject.com/en/3.0/howto/deployment/wsgi/
 
 import os
 import sys
-sys.path.append('/opt/bitnami/apps/django/django_projects/StarHorizonElearning')
-os.environ.setdefault("PYTHON_EGG_CACHE", "/opt/bitnami/apps/django/django_projects/StarHorizonElearning/egg_cache")
+
+sys.path.append("/opt/bitnami/apps/django/django_projects/StarHorizonElearning")
+os.environ.setdefault(
+    "PYTHON_EGG_CACHE",
+    "/opt/bitnami/apps/django/django_projects/StarHorizonElearning/egg_cache",
+)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "StarHorizonElearning.settings")
+from whitenoise import WhiteNoise
 from django.core.wsgi import get_wsgi_application
-#application = get_wsgi_application()
+
+application = get_wsgi_application()
+application = WhiteNoise(application, root="static", prefix="static/")
 
 
+"""
 import time
 import traceback
 import signal
@@ -30,3 +38,4 @@ except Exception:
         traceback.print_exc()
         os.kill(os.getpid(), signal.SIGINT)
         time.sleep(2.5)
+"""
