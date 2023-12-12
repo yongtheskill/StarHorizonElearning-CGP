@@ -289,7 +289,7 @@ def individualAccountView(request, userId):
 
 @login_required
 def classListView(request):
-    classes = list(request.user.classes.all())
+    classes = list(request.user.classes.all().order_by("className"))
 
     outstandingQuizzes = []
     outstandingLivelessons = []
